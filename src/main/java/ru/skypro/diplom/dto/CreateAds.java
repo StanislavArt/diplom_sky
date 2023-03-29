@@ -1,4 +1,4 @@
-package ru.skypro.diplom.DTO;
+package ru.skypro.diplom.dto;
 
 public class CreateAds {
 

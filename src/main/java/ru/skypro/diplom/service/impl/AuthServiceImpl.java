@@ -6,7 +6,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
-import ru.skypro.diplom.DTO.RegisterReq;
+import ru.skypro.diplom.dto.RegisterReq;
 import ru.skypro.diplom.enums.Role;
 import ru.skypro.diplom.service.AuthService;
 

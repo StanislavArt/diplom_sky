@@ -3,7 +3,7 @@ package ru.skypro.diplom.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import ru.skypro.diplom.DTO.CreateAds;
+import ru.skypro.diplom.dto.CreateAds;
 import ru.skypro.diplom.model.Comment;
 
 @RestController

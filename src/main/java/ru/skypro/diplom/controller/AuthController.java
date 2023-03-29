@@ -4,7 +4,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import ru.skypro.diplom.enums.Role;
-import ru.skypro.diplom.DTO.*;
+import ru.skypro.diplom.dto.*;
 import ru.skypro.diplom.service.AuthService;
 
 import static ru.skypro.diplom.enums.Role.*;

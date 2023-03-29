@@ -3,7 +3,7 @@ package ru.skypro.diplom.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import ru.skypro.diplom.DTO.*;
+import ru.skypro.diplom.dto.*;
 import ru.skypro.diplom.model.User;
 
 @RestController

@@ -1,4 +1,4 @@
-package ru.skypro.diplom.model;
+package ru.skypro.diplom.dto;
 
 public class FullAds {
     private String title;

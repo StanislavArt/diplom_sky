@@ -1,4 +1,4 @@
-package ru.skypro.diplom.DTO;
+package ru.skypro.diplom.dto;
 
 import ru.skypro.diplom.model.Comment;
 

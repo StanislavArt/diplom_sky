@@ -1,5 +1,7 @@
 package ru.skypro.diplom.model;
 
+import ru.skypro.diplom.enums.Role;
+
 import javax.persistence.*;
 import java.util.Objects;
 import java.util.Set;
@@ -24,6 +26,10 @@ public class User {
     private String regDate;
     private String city;
     private String image;
+
+    private String password;
+
+    private Role role;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Ads> adsSet;
@@ -111,6 +117,22 @@ public class User {
 
     public void setCommentSet(Set<Comment> commentSet) {
         this.commentSet = commentSet;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 
     @Override

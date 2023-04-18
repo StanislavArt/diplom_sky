@@ -28,6 +28,9 @@ public class User {
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Ads> adsSet;
 
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Comment> commentSet;
+
     public User() {}
 
     public int getId() {
@@ -100,6 +103,14 @@ public class User {
 
     public void setImage(String image) {
         this.image = image;
+    }
+
+    public Set<Comment> getCommentSet() {
+        return commentSet;
+    }
+
+    public void setCommentSet(Set<Comment> commentSet) {
+        this.commentSet = commentSet;
     }
 
     @Override

@@ -93,9 +93,10 @@ public class AdsController {
     }
 
     @PatchMapping("/{adPk}/comments/{id}")
-    public ResponseEntity<?> updateComments(@PathVariable int id, @PathVariable int adPk, @RequestBody CreateComment createComment) {
-
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Comment> updateComments(@PathVariable int id, @PathVariable int adPk, @RequestBody CreateComment createComment) {
+        Comment comment = commentService.updateComments(id, adPk, createComment);
+        if (comment == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        return ResponseEntity.ok(comment);
     }
 
     @PatchMapping("/image/{id}")

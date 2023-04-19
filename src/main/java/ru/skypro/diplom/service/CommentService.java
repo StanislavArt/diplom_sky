@@ -85,7 +85,7 @@ public class CommentService {
 
         Comment comment = commentRepository.findById(id).orElse(null);
         // NOT_FOUND
-        //if (comment == null)
+        //if (comment == null)dd
 
         comment.setText(createComment.getText());
         comment.setCreatedAt(LocalDateTime.now().toString());

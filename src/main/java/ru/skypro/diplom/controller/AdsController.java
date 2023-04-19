@@ -1,23 +1,29 @@
 package ru.skypro.diplom.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.diplom.dto.CreateAds;
 import ru.skypro.diplom.dto.ResponseWrapperAds;
 import ru.skypro.diplom.model.Comment;
+import ru.skypro.diplom.model.User;
+import ru.skypro.diplom.service.AdsService;
 
 @RestController
 @RequestMapping("ads")
 @CrossOrigin(value = "http://localhost:3000")
 public class AdsController {
+    private final AdsService adsService;
+
+    public AdsController(AdsService adsService) {
+        this.adsService = adsService;
+    }
 
     @GetMapping
     public ResponseEntity<ResponseWrapperAds> getAllAds() {
-
-
-
-        return ResponseEntity.ok().build();
+        ResponseWrapperAds responseWrapperAds = adsService.getAllAds();
+        return ResponseEntity.ok(responseWrapperAds);
     }
 
     @PostMapping
@@ -27,9 +33,10 @@ public class AdsController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<?> getAds() {
-
-        return ResponseEntity.ok().build();
+    public ResponseEntity<ResponseWrapperAds> getAds() {
+        ResponseWrapperAds responseWrapperAds = adsService.getAds();
+        if (responseWrapperAds == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        return ResponseEntity.ok(responseWrapperAds);
     }
 
     @GetMapping("/{adPK}/comments")

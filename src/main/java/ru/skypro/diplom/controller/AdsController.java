@@ -4,13 +4,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import ru.skypro.diplom.dto.CreateAds;
-import ru.skypro.diplom.dto.FullAds;
-import ru.skypro.diplom.dto.ResponseWrapperAds;
+import ru.skypro.diplom.dto.*;
 import ru.skypro.diplom.model.Ads;
 import ru.skypro.diplom.model.Comment;
 import ru.skypro.diplom.model.User;
 import ru.skypro.diplom.service.AdsService;
+import ru.skypro.diplom.service.CommentService;
 
 import java.io.IOException;
 
@@ -19,9 +18,11 @@ import java.io.IOException;
 @CrossOrigin(value = "http://localhost:3000")
 public class AdsController {
     private final AdsService adsService;
+    private final CommentService commentService;
 
-    public AdsController(AdsService adsService) {
+    public AdsController(AdsService adsService, CommentService commentService) {
         this.adsService = adsService;
+        this.commentService = commentService;
     }
 
     @GetMapping
@@ -44,16 +45,18 @@ public class AdsController {
         return ResponseEntity.ok(responseWrapperAds);
     }
 
-    @GetMapping("/{adPK}/comments")
-    public ResponseEntity<?> getComments(@PathVariable String adPK) {
-
-        return ResponseEntity.ok().build();
+    @GetMapping("/{adPk}/comments")
+    public ResponseEntity<ResponseWrapperComment> getComments(@PathVariable Integer adPk) {
+        ResponseWrapperComment responseWrapperComment = commentService.getComments(adPk);
+        if (responseWrapperComment == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        return ResponseEntity.ok(responseWrapperComment);
     }
 
-    @PostMapping("/{adPK}/comments")
-    public ResponseEntity<?> addComments(@RequestBody Comment comment, @PathVariable String adPK) {
-
-        return ResponseEntity.ok().build();
+    @PostMapping("/{adPk}/comments")
+    public ResponseEntity<Comment> addComments(@RequestBody CreateComment createComment, @PathVariable int adPk) {
+        Comment comment = commentService.addComment(createComment, adPk);
+        if (comment == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        return ResponseEntity.ok(comment);
     }
 
     @GetMapping("/{id}")
@@ -77,19 +80,20 @@ public class AdsController {
     }
 
     @GetMapping("/{adPK}/comments/{id}")
-    public ResponseEntity<?> getComments(@PathVariable int id, @PathVariable String adPK) {
+    public ResponseEntity<Comment> getComment(@PathVariable int id, @PathVariable int adPk) {
+        Comment comment = commentService.getComment(id, adPk);
+        if (comment == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        return ResponseEntity.ok(comment);
+    }
 
+    @DeleteMapping("/{adPk}/comments/{id}")
+    public ResponseEntity<Void> deleteComments(@PathVariable int id, @PathVariable int adPk) {
+        commentService.deleteComments(id, adPk);
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/{adPK}/comments/{id}")
-    public ResponseEntity<?> deleteComments(@PathVariable int id, @PathVariable String adPK) {
-
-        return ResponseEntity.ok().build();
-    }
-
-    @PatchMapping("/{adPK}/comments/{id}")
-    public ResponseEntity<?> updateComments(@PathVariable int id, @PathVariable String adPK, @RequestBody Comment comment) {
+    @PatchMapping("/{adPk}/comments/{id}")
+    public ResponseEntity<?> updateComments(@PathVariable int id, @PathVariable int adPk, @RequestBody CreateComment createComment) {
 
         return ResponseEntity.ok().build();
     }

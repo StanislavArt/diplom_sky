@@ -58,7 +58,7 @@ public class AdsService {
         // проверка на авторизацию
         // ...
 
-        Ads ads = adsRepository.findById(id).get();
+        Ads ads = adsRepository.findById(id).orElse(null);
         if (ads == null) return null;
         return getFullAdsDTO(ads);
     }
@@ -67,7 +67,7 @@ public class AdsService {
         // проверка на авторизацию
         // ...
 
-        Ads ads = adsRepository.findById(id).get();
+        Ads ads = adsRepository.findById(id).orElse(null);
         if (ads == null) return null;
         updateAdsDTO(ads, createAds);
         ads = adsRepository.save(ads);

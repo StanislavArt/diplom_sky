@@ -4,15 +4,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.diplom.dto.CreateAds;
+import ru.skypro.diplom.dto.ResponseWrapperAds;
 import ru.skypro.diplom.model.Comment;
 
 @RestController
-@RequestMapping("Ads")
+@RequestMapping("ads")
 @CrossOrigin(value = "http://localhost:3000")
 public class AdsController {
 
     @GetMapping
-    public ResponseEntity<?> getAllAds() {
+    public ResponseEntity<ResponseWrapperAds> getAllAds() {
+
+
 
         return ResponseEntity.ok().build();
     }

@@ -17,6 +17,15 @@ public class Image {
 
     public Image() {}
 
+    public Image(String data, Ads ads) {
+        this.data = data;
+        this.ads = ads;
+    }
+
+    public Image(String data) {
+        this.data = data;
+    }
+
     public int getId() {
         return id;
     }

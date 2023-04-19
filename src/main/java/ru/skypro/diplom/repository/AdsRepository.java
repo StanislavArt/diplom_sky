@@ -6,8 +6,12 @@ import ru.skypro.diplom.model.Ads;
 import ru.skypro.diplom.model.User;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface AdsRepository extends JpaRepository<Ads,Integer> {
     List<Ads> findAllByAuthor(User author);
+
+    @Override
+    Optional<Ads> findById(Integer integer);
 }

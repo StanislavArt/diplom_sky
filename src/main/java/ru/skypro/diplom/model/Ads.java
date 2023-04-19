@@ -12,6 +12,7 @@ public class Ads {
     private int pk;
 
     private String title;
+    private String description;
 
     @ManyToOne
     @JoinColumn(name = "author_id")
@@ -26,6 +27,12 @@ public class Ads {
     private Set<Comment> comments;
 
     public Ads() {}
+
+    public Ads(String title, String description, int price) {
+        this.title = title;
+        this.description = description;
+        this.price = price;
+    }
 
     public int getPk() {
         return pk;
@@ -73,6 +80,14 @@ public class Ads {
 
     public void setComments(Set<Comment> comments) {
         this.comments = comments;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     @Override

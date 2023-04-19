@@ -5,10 +5,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.diplom.dto.CreateAds;
+import ru.skypro.diplom.dto.FullAds;
 import ru.skypro.diplom.dto.ResponseWrapperAds;
+import ru.skypro.diplom.model.Ads;
 import ru.skypro.diplom.model.Comment;
 import ru.skypro.diplom.model.User;
 import ru.skypro.diplom.service.AdsService;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("ads")
@@ -27,9 +31,10 @@ public class AdsController {
     }
 
     @PostMapping
-    public ResponseEntity<?> addAds(@RequestPart(value = "properties") CreateAds createAds, @RequestPart(value = "image") MultipartFile file) {
-
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Ads> addAds(@RequestPart(value = "properties") CreateAds createAds, @RequestPart(value = "image") MultipartFile file) throws IOException {
+        Ads ads = adsService.addAds(createAds, file.getBytes());
+        if (ads == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        return ResponseEntity.ok(ads);
     }
 
     @GetMapping("/me")
@@ -52,9 +57,10 @@ public class AdsController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getAds(@PathVariable int id) {
-
-        return ResponseEntity.ok().build();
+    public ResponseEntity<FullAds> getFullAd(@PathVariable int id) {
+        FullAds fullAds = adsService.getFullAd(id);
+        if (fullAds == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        return ResponseEntity.ok(fullAds);
     }
 
     @DeleteMapping("/{id}")

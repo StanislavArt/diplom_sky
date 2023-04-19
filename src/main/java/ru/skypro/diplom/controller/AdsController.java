@@ -100,9 +100,11 @@ public class AdsController {
     }
 
     @PatchMapping("/image/{id}")
-    public ResponseEntity<?> updateImage(@PathVariable int id, @RequestPart(value = "image") MultipartFile file) {
-
-        return ResponseEntity.ok().build();
+    public ResponseEntity<MultipartFile> updateImage(@PathVariable int id, @RequestPart(value = "image") MultipartFile file) throws IOException {
+        if (!adsService.updateImage(id, file.getBytes())) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        return ResponseEntity.ok(file);
     }
 
 }

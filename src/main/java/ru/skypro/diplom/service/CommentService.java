@@ -80,12 +80,10 @@ public class CommentService {
         // ...
 
         Ads ads = adsRepository.findById(adPk).orElse(null);
-        // NOT_FOUND
-        // if (ads == null) return null;
+        if (ads == null) return null;
 
         Comment comment = commentRepository.findById(id).orElse(null);
-        // NOT_FOUND
-        //if (comment == null)dd
+        if (comment == null) return null;
 
         comment.setText(createComment.getText());
         comment.setCreatedAt(LocalDateTime.now().toString());

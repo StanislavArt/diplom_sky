@@ -64,15 +64,16 @@ public class AdsController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> removeAds(@PathVariable int id) {
-
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Void> removeAds(@PathVariable int id) {
+        adsService.removeAds(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<?> updateAds(@PathVariable int id, @RequestBody CreateAds createAds) {
-
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Ads> updateAds(@PathVariable int id, @RequestBody CreateAds createAds) {
+        Ads ads = adsService.updateAds(id, createAds);
+        if (ads == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        return ResponseEntity.ok(ads);
     }
 
     @GetMapping("/{adPK}/comments/{id}")

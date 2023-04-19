@@ -14,4 +14,5 @@ public interface AdsRepository extends JpaRepository<Ads,Integer> {
 
     @Override
     Optional<Ads> findById(Integer integer);
+
 }

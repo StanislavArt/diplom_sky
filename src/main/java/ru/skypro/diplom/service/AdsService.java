@@ -63,6 +63,24 @@ public class AdsService {
         return getFullAdsDTO(ads);
     }
 
+    public Ads updateAds(int id, CreateAds createAds) {
+        // проверка на авторизацию
+        // ...
+
+        Ads ads = adsRepository.findById(id).get();
+        if (ads == null) return null;
+        updateAdsDTO(ads, createAds);
+        ads = adsRepository.save(ads);
+        if (ads == null) logger.error("Write error into database (function 'updateAds()'");
+        return ads;
+    }
+
+    public void removeAds(int id) {
+        // проверка на авторизацию
+        // ...
+
+        adsRepository.deleteById(id);
+    }
 
     private ResponseWrapperAds getResponseWrapperAdsDTO(List<Ads> adsList) {
         ResponseWrapperAds responseWrapperAds = new ResponseWrapperAds(adsList);
@@ -87,6 +105,12 @@ public class AdsService {
         Ads ads = new Ads(createAds.getTitle(), createAds.getDescription(), createAds.getPrice());
         ads.setAuthor(userService.getCurrentUser());
         return ads;
+    }
+
+    private void updateAdsDTO(Ads ads, CreateAds createAds) {
+        ads.setTitle(createAds.getTitle());
+        ads.setDescription(createAds.getDescription());
+        ads.setPrice(createAds.getPrice());
     }
 
 

@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.SessionScope;
+import ru.skypro.diplom.dto.NewPassword;
 import ru.skypro.diplom.dto.UserUpd;
 import ru.skypro.diplom.model.User;
 import ru.skypro.diplom.repository.UserRepository;
@@ -39,6 +40,32 @@ public class UserService {
         user = userRepository.save(user);
         if (user == null) logger.error("Write error into database (function 'updateUser()'");
         return user;
+    }
+
+    public boolean updateUserImage(byte[] data) {
+        User user = getCurrentUser();
+        user.setImage(new String(data));
+        user = userRepository.save(user);
+        if (user == null) {
+            logger.error("Write error into database (function 'updateUser()'");
+            return false;
+        }
+        return true;
+    }
+
+    public boolean changePassword(NewPassword newPassword) {
+        User user = getCurrentUser();
+
+        if (!user.getPassword().equals(newPassword.getCurrentPassword())) return false;
+        if (user.getPassword().equals(newPassword.getNewPassword())) return false;
+
+        user.setPassword(newPassword.getNewPassword());
+        user = userRepository.save(user);
+        if (user == null) {
+            logger.error("Write error into database (function 'updateUser()'");
+            return false;
+        }
+        return false;
     }
 
 }

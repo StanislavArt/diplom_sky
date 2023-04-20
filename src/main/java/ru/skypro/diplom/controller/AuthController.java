@@ -20,7 +20,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginReq req) {
+    public ResponseEntity<Void> login(@RequestBody LoginReq req) {
         LoggerFactory.getLogger(this.getClass()).info("login " + req.toString());
         if (authService.login(req.getUsername(), req.getPassword())) {
             return ResponseEntity.ok().build();

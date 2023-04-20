@@ -8,6 +8,8 @@ import ru.skypro.diplom.dto.*;
 import ru.skypro.diplom.model.User;
 import ru.skypro.diplom.service.UserService;
 
+import java.io.IOException;
+
 @RestController
 @RequestMapping("users")
 @CrossOrigin(value = "http://localhost:3000")
@@ -20,9 +22,15 @@ public class UserController {
     }
 
     @PostMapping("/set_password")
-    public ResponseEntity<?> setPassword(@RequestBody NewPassword newPassword ) {
+    public ResponseEntity<String> setPassword(@RequestBody NewPassword newPassword ) {
+        User user = userService.getCurrentUser();
+        if (user == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 
-        return ResponseEntity.ok().build();
+        if (!userService.changePassword(newPassword)) {
+            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
+        }
+
+        return ResponseEntity.ok("User's password is changed");
     }
 
     @GetMapping("/me")
@@ -44,8 +52,13 @@ public class UserController {
     }
 
     @PatchMapping ("/me/image")
-    public ResponseEntity<?> updateUserImage(@RequestPart(value = "image") MultipartFile file) {
+    public ResponseEntity<String> updateUserImage(@RequestPart(value = "image") MultipartFile file) throws IOException {
+        User user = userService.getCurrentUser();
+        if (user == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 
-        return ResponseEntity.ok().build();
+        if (!userService.updateUserImage(file.getBytes())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+        return ResponseEntity.ok("User's image is changed!");
     }
 }

@@ -12,7 +12,7 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping("users")
-@CrossOrigin(value = "http://localhost:3000")
+@CrossOrigin(value = "http://192.168.99.100:3000")
 public class UserController {
 
     private UserService userService;

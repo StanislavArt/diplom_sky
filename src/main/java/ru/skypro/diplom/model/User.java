@@ -22,9 +22,9 @@ public class User {
     private String email;
     private String phone;
 
-    @Column(name = "reg_date")
-    private String regDate;
-    private String city;
+//    @Column(name = "reg_date")
+//    private String regDate;
+//    private String city;
     private String image;
 
     private String password;
@@ -87,21 +87,21 @@ public class User {
         this.phone = phone;
     }
 
-    public String getRegDate() {
-        return regDate;
-    }
+//    public String getRegDate() {
+//        return regDate;
+//    }
+//
+//    public void setRegDate(String regDate) {
+//        this.regDate = regDate;
+//    }
 
-    public void setRegDate(String regDate) {
-        this.regDate = regDate;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
+//    public String getCity() {
+//        return city;
+//    }
+//
+//    public void setCity(String city) {
+//        this.city = city;
+//    }
 
     public String getImage() {
         return image;
@@ -143,8 +143,8 @@ public class User {
                 ", lastName='" + lastName + '\'' +
                 ", email='" + email + '\'' +
                 ", phone='" + phone + '\'' +
-                ", regDate='" + regDate + '\'' +
-                ", city='" + city + '\'' +
+               // ", regDate='" + regDate + '\'' +
+               // ", city='" + city + '\'' +
                 ", image='" + image + '\'' +
                 '}';
     }
@@ -154,7 +154,8 @@ public class User {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return id == user.id && Objects.equals(firstName, user.firstName) && Objects.equals(lastName, user.lastName) && Objects.equals(email, user.email) && Objects.equals(phone, user.phone) && Objects.equals(regDate, user.regDate) && Objects.equals(city, user.city);
+        //return id == user.id && Objects.equals(firstName, user.firstName) && Objects.equals(lastName, user.lastName) && Objects.equals(email, user.email) && Objects.equals(phone, user.phone) && Objects.equals(regDate, user.regDate) && Objects.equals(city, user.city);
+        return id == user.id && Objects.equals(firstName, user.firstName) && Objects.equals(lastName, user.lastName) && Objects.equals(email, user.email) && Objects.equals(phone, user.phone);
     }
 
     @Override

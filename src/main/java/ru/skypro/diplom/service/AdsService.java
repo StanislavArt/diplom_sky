@@ -8,10 +8,8 @@ import ru.skypro.diplom.dto.CreateAds;
 import ru.skypro.diplom.dto.FullAds;
 import ru.skypro.diplom.dto.ResponseWrapperAds;
 import ru.skypro.diplom.model.Ads;
-import ru.skypro.diplom.model.Image;
 import ru.skypro.diplom.model.User;
 import ru.skypro.diplom.repository.AdsRepository;
-import ru.skypro.diplom.repository.ImageRepository;
 
 import java.util.HashSet;
 import java.util.List;
@@ -22,13 +20,11 @@ import java.util.Set;
 public class AdsService {
     private final AdsRepository adsRepository;
     private final UserService userService;
-    private final ImageRepository imageRepository;
     private final Logger logger = LoggerFactory.getLogger(AdsService.class);
 
-    public AdsService(AdsRepository adsRepository, UserService userService, ImageRepository imageRepository) {
+    public AdsService(AdsRepository adsRepository, UserService userService) {
         this.adsRepository = adsRepository;
         this.userService = userService;
-        this.imageRepository = imageRepository;
     }
 
     public ResponseWrapperAds getAllAds() {

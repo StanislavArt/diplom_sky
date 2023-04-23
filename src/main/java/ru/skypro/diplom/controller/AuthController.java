@@ -10,7 +10,7 @@ import ru.skypro.diplom.service.AuthService;
 import static ru.skypro.diplom.enums.Role.*;
 
 @RestController
-@CrossOrigin(value = "http://localhost:3000")
+@CrossOrigin(value = "http://192.168.99.100:3000")
 public class AuthController {
 
     private final AuthService authService;

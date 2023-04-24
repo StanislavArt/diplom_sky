@@ -6,11 +6,22 @@ import java.util.List;
 public class ResponseWrapperAds {
     private int count;
     private List<Ads> results;
-    //private Ads[] results;
 
-    public ResponseWrapperAds(List<Ads> results) {
-        this.count = results.size();
-        //this.results = results.toArray(new Ads[this.count]);
+    public ResponseWrapperAds() {}
+
+    public int getCount() {
+        return count;
+    }
+
+    public void setCount(int count) {
+        this.count = count;
+    }
+
+    public List<Ads> getResults() {
+        return results;
+    }
+
+    public void setResults(List<Ads> results) {
         this.results = results;
     }
 }

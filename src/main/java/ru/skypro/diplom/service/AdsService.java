@@ -29,7 +29,8 @@ public class AdsService {
 
     public ResponseWrapperAds getAllAds() {
        List<Ads> adsList = adsRepository.findAll();
-        return getResponseWrapperAdsDTO(adsList);
+       //if (adsList.isEmpty()) { return null; }
+       return getResponseWrapperAdsDTO(adsList);
     }
 
     public ResponseWrapperAds getAds() {
@@ -92,7 +93,9 @@ public class AdsService {
 //    }
 
     private ResponseWrapperAds getResponseWrapperAdsDTO(List<Ads> adsList) {
-        ResponseWrapperAds responseWrapperAds = new ResponseWrapperAds(adsList);
+        ResponseWrapperAds responseWrapperAds = new ResponseWrapperAds();
+        responseWrapperAds.setCount(adsList.size());
+        responseWrapperAds.setResults(adsList);
         return responseWrapperAds;
     }
 

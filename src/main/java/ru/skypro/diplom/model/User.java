@@ -152,9 +152,10 @@ public class User {
                 ", lastName='" + lastName + '\'' +
                 ", email='" + email + '\'' +
                 ", phone='" + phone + '\'' +
-               // ", regDate='" + regDate + '\'' +
-               // ", city='" + city + '\'' +
                 ", image='" + image + '\'' +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", role=" + role +
                 '}';
     }
 

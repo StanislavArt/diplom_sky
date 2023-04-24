@@ -44,7 +44,7 @@ public class UserController {
     public ResponseEntity<User> updateUser(@RequestBody UserUpd userUpd ) {
         User user = userService.getCurrentUser();
         if (user == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        if (userUpd.getFirstName().isEmpty()) return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        //if (userUpd.getFirstName().isEmpty()) return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         user = userService.updateUser(userUpd);
         if(user == null) return ResponseEntity.status(HttpStatus.CONFLICT).build();
 

@@ -38,9 +38,10 @@ public class AuthServiceImpl implements AuthService {
 
         ru.skypro.diplom.model.User user = userService.findByCredentials(userName, password);
         if (user == null) {
-            user = new ru.skypro.diplom.model.User();
+            user = userService.getCurrentUser();
             user.setUsername(userName);
             user.setPassword(password);
+            user.setEmail(userName);
         }
         userService.setCurrentUser(user);
 

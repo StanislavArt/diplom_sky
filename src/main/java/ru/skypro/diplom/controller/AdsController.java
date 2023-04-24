@@ -28,6 +28,7 @@ public class AdsController {
     @GetMapping
     public ResponseEntity<ResponseWrapperAds> getAllAds() {
         ResponseWrapperAds responseWrapperAds = adsService.getAllAds();
+        ResponseEntity<ResponseWrapperAds> res = ResponseEntity.ok(responseWrapperAds);
         return ResponseEntity.ok(responseWrapperAds);
     }
 

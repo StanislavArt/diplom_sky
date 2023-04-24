@@ -10,7 +10,6 @@ import ru.skypro.diplom.model.User;
 import ru.skypro.diplom.repository.UserRepository;
 
 @Service
-@SessionScope
 public class UserService {
     private final UserRepository userRepository;
     private final Logger logger = LoggerFactory.getLogger(UserService.class);
@@ -18,7 +17,7 @@ public class UserService {
 
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.currentUser = null;
+        this.currentUser = new User();
     }
 
     public User getCurrentUser() {
@@ -34,8 +33,8 @@ public class UserService {
         user.setFirstName(userUpd.getFirstName());
         user.setLastName(userUpd.getLastName());
         //user.setCity(userUpd.getCity());
-        user.setEmail(userUpd.getEmail());
-        user.setPhone(user.getPhone());
+        //user.setEmail(userUpd.getEmail());
+        user.setPhone(userUpd.getPhone());
 
         user = userRepository.save(user);
         if (user == null) logger.error("Write error into database (function 'updateUser()'");

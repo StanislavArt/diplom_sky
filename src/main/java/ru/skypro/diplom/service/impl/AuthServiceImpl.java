@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import ru.skypro.diplom.dto.RegisterReq;
 import ru.skypro.diplom.enums.Role;
 import ru.skypro.diplom.service.AuthService;
+import ru.skypro.diplom.service.UserService;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -17,9 +18,12 @@ public class AuthServiceImpl implements AuthService {
 
     private final PasswordEncoder encoder;
 
-    public AuthServiceImpl(UserDetailsManager manager) {
+    private final UserService userService;
+
+    public AuthServiceImpl(UserDetailsManager manager, UserService userService) {
         this.manager = manager;
         this.encoder = new BCryptPasswordEncoder();
+        this.userService = userService;
     }
 
     @Override
@@ -31,6 +35,15 @@ public class AuthServiceImpl implements AuthService {
         UserDetails userDetails = manager.loadUserByUsername(userName);
         String encryptedPassword = userDetails.getPassword();
         String encryptedPasswordWithoutEncryptionType = encryptedPassword.substring(8);
+
+        ru.skypro.diplom.model.User user = userService.findByCredentials(userName, password);
+        if (user == null) {
+            user = new ru.skypro.diplom.model.User();
+            user.setUsername(userName);
+            user.setPassword(password);
+        }
+        userService.setCurrentUser(user);
+
         return encoder.matches(password, encryptedPasswordWithoutEncryptionType);
     }
 

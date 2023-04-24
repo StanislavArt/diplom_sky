@@ -33,7 +33,7 @@ public class UserService {
         User user = getCurrentUser();
         user.setFirstName(userUpd.getFirstName());
         user.setLastName(userUpd.getLastName());
-        user.setCity(userUpd.getCity());
+        //user.setCity(userUpd.getCity());
         user.setEmail(userUpd.getEmail());
         user.setPhone(user.getPhone());
 
@@ -66,6 +66,10 @@ public class UserService {
             return false;
         }
         return false;
+    }
+
+    public User findByCredentials(String userName, String password) {
+        return userRepository.findUserOptionalByUsernameAndPassword(userName, password).orElse(null);
     }
 
 }

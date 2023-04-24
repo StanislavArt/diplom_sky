@@ -86,7 +86,7 @@ public class CommentService {
         if (comment == null) return null;
 
         comment.setText(createComment.getText());
-        comment.setCreatedAt(LocalDateTime.now().toString());
+        comment.setCreatedAt(System.currentTimeMillis());
         comment = commentRepository.save(comment);
         return comment;
     }
@@ -101,7 +101,7 @@ public class CommentService {
     private Comment createCommentDTO(CreateComment createComment) {
         Comment comment = new Comment();
         comment.setText(createComment.getText());
-        comment.setCreatedAt(LocalDateTime.now().toString());
+        comment.setCreatedAt(System.currentTimeMillis());
         return comment;
     }
 }

@@ -43,10 +43,11 @@ public class AdsService {
         User user = userService.getCurrentUser();
         if (user == null) return null;
         Ads ads = createAdsDTO(createAds);
+        ads.setImage(new String(image));
 
-        Set<Image> images = new HashSet<>();
-        images.add(new Image(new String(image)));
-        ads.setImages(images);
+//        Set<Image> images = new HashSet<>();
+//        images.add(new Image(new String(image)));
+//        ads.setImages(images);
 
         Ads adsDB = adsRepository.save(ads);
         if (adsDB == null) logger.error("Write error into database (function 'addAds()'");
@@ -81,14 +82,14 @@ public class AdsService {
         adsRepository.deleteById(id);
     }
 
-    public boolean updateImage(int id, byte[] data) {
-        Image image = imageRepository.findById(id).orElse(null);
-        if (image == null) return false;
-
-        image.setData(new String(data));
-        imageRepository.save(image);
-        return true;
-    }
+//    public boolean updateImage(int id, byte[] data) {
+//        Image image = imageRepository.findById(id).orElse(null);
+//        if (image == null) return false;
+//
+//        image.setData(new String(data));
+//        imageRepository.save(image);
+//        return true;
+//    }
 
     private ResponseWrapperAds getResponseWrapperAdsDTO(List<Ads> adsList) {
         ResponseWrapperAds responseWrapperAds = new ResponseWrapperAds(adsList);
@@ -105,7 +106,8 @@ public class AdsService {
         fullAds.setAuthorLastName(ads.getAuthor().getLastName());
         fullAds.setEmail(ads.getAuthor().getEmail());
         fullAds.setPhone(ads.getAuthor().getPhone());
-        fullAds.setImages((String[])ads.getImages().toArray());
+//        fullAds.setImages((String[])ads.getImages().toArray());
+        fullAds.setImage(ads.getImage());
         return fullAds;
     }
 

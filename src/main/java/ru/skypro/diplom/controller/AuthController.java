@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.skypro.diplom.enums.Role;
 import ru.skypro.diplom.dto.*;
 import ru.skypro.diplom.service.AuthService;
+import ru.skypro.diplom.service.UserService;
 
 import static ru.skypro.diplom.enums.Role.*;
 

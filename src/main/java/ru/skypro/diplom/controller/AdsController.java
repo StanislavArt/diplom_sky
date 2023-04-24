@@ -99,12 +99,12 @@ public class AdsController {
         return ResponseEntity.ok(comment);
     }
 
-    @PatchMapping("/image/{id}")
-    public ResponseEntity<MultipartFile> updateImage(@PathVariable int id, @RequestPart(value = "image") MultipartFile file) throws IOException {
-        if (!adsService.updateImage(id, file.getBytes())) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-        return ResponseEntity.ok(file);
-    }
+//    @PatchMapping("/image/{id}")
+//    public ResponseEntity<MultipartFile> updateImage(@PathVariable int id, @RequestPart(value = "image") MultipartFile file) throws IOException {
+//        if (!adsService.updateImage(id, file.getBytes())) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+//        }
+//        return ResponseEntity.ok(file);
+//    }
 
 }

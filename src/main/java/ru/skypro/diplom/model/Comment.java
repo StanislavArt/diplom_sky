@@ -20,7 +20,7 @@ public class Comment {
     @JoinColumn(name = "ads_id")
     private Ads ads;
 
-    private int createdAt;
+    private long createdAt;
 
     private String authorFirstName;
     private String text;
@@ -51,11 +51,11 @@ public class Comment {
         this.ads = ads;
     }
 
-    public int getCreatedAt() {
+    public long getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(int createdAt) {
+    public void setCreatedAt(long createdAt) {
         this.createdAt = createdAt;
     }
 

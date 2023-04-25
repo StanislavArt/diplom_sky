@@ -29,7 +29,6 @@ public class AdsService {
 
     public ResponseWrapperAds getAllAds() {
        List<Ads> adsList = adsRepository.findAll();
-       //if (adsList.isEmpty()) { return null; }
        return getResponseWrapperAdsDTO(adsList);
     }
 

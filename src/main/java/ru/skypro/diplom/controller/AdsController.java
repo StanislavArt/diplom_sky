@@ -15,7 +15,9 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping("ads")
-@CrossOrigin(value = "http://192.168.99.100:3000")
+//@CrossOrigin(value = "http://192.168.99.100:3000")
+//@CrossOrigin(value = "http://192.168.0.152:3000")
+@CrossOrigin(value = "http://localhost:3000")
 public class AdsController {
     private final AdsService adsService;
     private final CommentService commentService;
@@ -42,7 +44,6 @@ public class AdsController {
     @GetMapping("/me")
     public ResponseEntity<ResponseWrapperAds> getAds() {
         ResponseWrapperAds responseWrapperAds = adsService.getAds();
-        if (responseWrapperAds == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         return ResponseEntity.ok(responseWrapperAds);
     }
 

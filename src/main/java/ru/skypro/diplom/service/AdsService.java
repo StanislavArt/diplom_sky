@@ -6,11 +6,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.SessionScope;
 import ru.skypro.diplom.dto.CreateAds;
 import ru.skypro.diplom.dto.FullAds;
+import ru.skypro.diplom.dto.ResponseAds;
 import ru.skypro.diplom.dto.ResponseWrapperAds;
 import ru.skypro.diplom.model.Ads;
 import ru.skypro.diplom.model.User;
 import ru.skypro.diplom.repository.AdsRepository;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -29,7 +31,8 @@ public class AdsService {
 
     public ResponseWrapperAds getAllAds() {
        List<Ads> adsList = adsRepository.findAll();
-       return getResponseWrapperAdsDTO(adsList);
+       ResponseWrapperAds responseWrapperAds = getResponseWrapperAdsDTO(adsList);
+       return responseWrapperAds;
     }
 
     public ResponseWrapperAds getAds() {
@@ -39,19 +42,21 @@ public class AdsService {
         return getResponseWrapperAdsDTO(adsList);
     }
 
-    public Ads addAds(CreateAds createAds, byte[] image) {
+    public ResponseAds addAds(CreateAds createAds, byte[] image) {
         User user = userService.getCurrentUser();
         if (user == null) return null;
-        Ads ads = createAdsDTO(createAds);
-        ads.setImage(new String(image));
-
-//        Set<Image> images = new HashSet<>();
-//        images.add(new Image(new String(image)));
-//        ads.setImages(images);
+        Ads ads = new Ads();
+        ads.setTitle(createAds.getTitle());
+        ads.setDescription(createAds.getDescription());
+        ads.setPrice(createAds.getPrice());
+        ads.setAuthor(user);
+        //ads.setImage(new String(image));
+        ads.setImage("Picture");
 
         Ads adsDB = adsRepository.save(ads);
         if (adsDB == null) logger.error("Write error into database (function 'addAds()'");
-        return adsDB;
+        ResponseAds responseAds = createAdsDTO(adsDB);
+        return responseAds;
     }
 
     public FullAds getFullAd(int id) {
@@ -94,7 +99,12 @@ public class AdsService {
     private ResponseWrapperAds getResponseWrapperAdsDTO(List<Ads> adsList) {
         ResponseWrapperAds responseWrapperAds = new ResponseWrapperAds();
         responseWrapperAds.setCount(adsList.size());
-        responseWrapperAds.setResults(adsList);
+
+        List<ResponseAds> responseAdsList = new ArrayList<>();
+        for (Ads item : adsList) {
+            responseAdsList.add(createAdsDTO(item));
+        }
+        responseWrapperAds.setResults(responseAdsList);
         return responseWrapperAds;
     }
 
@@ -108,15 +118,19 @@ public class AdsService {
         fullAds.setAuthorLastName(ads.getAuthor().getLastName());
         fullAds.setEmail(ads.getAuthor().getEmail());
         fullAds.setPhone(ads.getAuthor().getPhone());
-//        fullAds.setImages((String[])ads.getImages().toArray());
         fullAds.setImage(ads.getImage());
         return fullAds;
     }
 
-    private Ads createAdsDTO(CreateAds createAds) {
-        Ads ads = new Ads(createAds.getTitle(), createAds.getDescription(), createAds.getPrice());
-        ads.setAuthor(userService.getCurrentUser());
-        return ads;
+    private ResponseAds createAdsDTO(Ads ads) {
+        if (ads == null) return null;
+        ResponseAds responseAds = new ResponseAds();
+        responseAds.setPk(ads.getPk());
+        responseAds.setTitle(ads.getTitle());
+        responseAds.setAuthor(ads.getAuthor().getId());
+        responseAds.setPrice(ads.getPrice());
+        responseAds.setImage(ads.getImage());
+        return responseAds;
     }
 
     private void updateAdsDTO(Ads ads, CreateAds createAds) {

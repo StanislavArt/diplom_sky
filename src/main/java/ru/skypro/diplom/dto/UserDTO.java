@@ -1,13 +1,14 @@
 package ru.skypro.diplom.dto;
 
-public class UserUpd {
+public class UserDTO {
+    private int id;
     private String firstName;
     private String lastName;
     private String email;
     private String phone;
-    private String city;
+    private String image;
 
-    public UserUpd() {}
+    public UserDTO() {}
 
     public String getFirstName() {
         return firstName;
@@ -41,11 +42,19 @@ public class UserUpd {
         this.phone = phone;
     }
 
-    public String getCity() {
-        return city;
+    public int getId() {
+        return id;
     }
 
-    public void setCity(String city) {
-        this.city = city;
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 }

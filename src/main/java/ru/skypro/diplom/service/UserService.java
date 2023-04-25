@@ -3,9 +3,8 @@ package ru.skypro.diplom.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.web.context.annotation.SessionScope;
 import ru.skypro.diplom.dto.NewPassword;
-import ru.skypro.diplom.dto.UserUpd;
+import ru.skypro.diplom.dto.UserDTO;
 import ru.skypro.diplom.model.User;
 import ru.skypro.diplom.repository.UserRepository;
 
@@ -28,17 +27,19 @@ public class UserService {
         this.currentUser = currentUser;
     }
 
-    public User updateUser(UserUpd userUpd) {
+    public UserDTO getUser() {
+        return getUserDTO(getCurrentUser());
+    }
+
+    public UserDTO updateUser(UserDTO userUpd) {
         User user = getCurrentUser();
         user.setFirstName(userUpd.getFirstName());
         user.setLastName(userUpd.getLastName());
-        //user.setCity(userUpd.getCity());
-        //user.setEmail(userUpd.getEmail());
         user.setPhone(userUpd.getPhone());
 
         user = userRepository.save(user);
         if (user == null) logger.error("Write error into database (function 'updateUser()'");
-        return user;
+        return getUserDTO(user);
     }
 
     public boolean updateUserImage(byte[] data) {
@@ -69,6 +70,18 @@ public class UserService {
 
     public User findByCredentials(String userName, String password) {
         return userRepository.findUserOptionalByUsernameAndPassword(userName, password).orElse(null);
+    }
+
+    private UserDTO getUserDTO(User user) {
+        UserDTO userDTO = new UserDTO();
+        if (user == null ) { return userDTO; }
+        userDTO.setId(user.getId());
+        userDTO.setFirstName(user.getFirstName());
+        userDTO.setLastName(user.getLastName());
+        userDTO.setEmail(user.getEmail());
+        userDTO.setPhone(user.getPhone());
+        userDTO.setImage(user.getImage());
+        return userDTO;
     }
 
 }

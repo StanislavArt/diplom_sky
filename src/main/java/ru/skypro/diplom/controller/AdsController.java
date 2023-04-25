@@ -35,9 +35,9 @@ public class AdsController {
     }
 
     @PostMapping
-    public ResponseEntity<Ads> addAds(@RequestPart(value = "properties") CreateAds createAds, @RequestPart(value = "image") MultipartFile file) throws IOException {
-        Ads ads = adsService.addAds(createAds, file.getBytes());
-        if (ads == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    public ResponseEntity<ResponseAds> addAds(@RequestPart(value = "properties") CreateAds createAds, @RequestPart(value = "image") MultipartFile file) throws IOException {
+        ResponseAds ads = adsService.addAds(createAds, file.getBytes());
+        if (ads == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         return ResponseEntity.ok(ads);
     }
 

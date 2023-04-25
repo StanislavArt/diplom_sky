@@ -36,21 +36,18 @@ public class UserController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<User> getUser() {
+    public ResponseEntity<UserDTO> getUser() {
         User user = userService.getCurrentUser();
         if (user == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        return ResponseEntity.ok(user);
+        return ResponseEntity.ok(userService.getUser());
     }
 
     @PatchMapping ("/me")
-    public ResponseEntity<User> updateUser(@RequestBody UserUpd userUpd ) {
+    public ResponseEntity<UserDTO> updateUser(@RequestBody UserDTO userUpd ) {
         User user = userService.getCurrentUser();
         if (user == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        //if (userUpd.getFirstName().isEmpty()) return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-        user = userService.updateUser(userUpd);
-        if(user == null) return ResponseEntity.status(HttpStatus.CONFLICT).build();
-
-        return ResponseEntity.ok().build();
+        UserDTO userDTO = userService.updateUser(userUpd);
+        return ResponseEntity.ok(userDTO);
     }
 
     @PatchMapping ("/me/image")

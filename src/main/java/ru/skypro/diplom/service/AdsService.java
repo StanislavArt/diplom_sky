@@ -60,9 +60,6 @@ public class AdsService {
     }
 
     public FullAds getFullAd(int id) {
-        // проверка на авторизацию
-        // ...
-
         Ads ads = adsRepository.findById(id).orElse(null);
         if (ads == null) return null;
         return getFullAdsDTO(ads);

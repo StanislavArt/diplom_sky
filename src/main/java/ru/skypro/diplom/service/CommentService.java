@@ -4,14 +4,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.SessionScope;
-import ru.skypro.diplom.dto.CreateComment;
+import ru.skypro.diplom.dto.CommentDTO;
 import ru.skypro.diplom.dto.ResponseWrapperComment;
 import ru.skypro.diplom.model.Ads;
 import ru.skypro.diplom.model.Comment;
 import ru.skypro.diplom.repository.AdsRepository;
 import ru.skypro.diplom.repository.CommentRepository;
 
-import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -38,19 +38,18 @@ public class CommentService {
         return getResponseWrapperCommentDTO(comments);
     }
 
-    public Comment addComment(CreateComment createComment, int adPk) {
-        // проверка авторизации
-        // ...
-
+    public CommentDTO addComment(CommentDTO commentDTO, int adPk) {
         Ads ads = adsRepository.findById(adPk).orElse(null);
         if (ads == null) return null;
 
-        Comment comment = createCommentDTO(createComment);
+        Comment comment = new Comment();
         comment.setAds(ads);
         comment.setAuthor(userService.getCurrentUser());
+        comment.setCreatedAt(System.currentTimeMillis());
+        comment.setText(commentDTO.getText());
         comment = commentRepository.save(comment);
         if (comment == null) logger.error("Write error into database (function 'addComment()'");
-        return comment;
+        return getCommentDTO(comment);
     }
 
     public Comment getComment(int id, int adPk) {
@@ -60,48 +59,51 @@ public class CommentService {
         return comment;
     }
 
-    public void deleteComments(int id, int adPk) {
-        // проверка авторизации
-        // ...
-
+    public boolean deleteComments(int id, int adPk) {
         Ads ads = adsRepository.findById(adPk).orElse(null);
-        // NOT_FOUND
-        // if (ads == null) return null;
+        if (ads == null) return false;
 
         Comment comment = commentRepository.findById(id).orElse(null);
-        // NOT_FOUND
-        //if (comment == null)
+        if (comment == null) return false;
 
         commentRepository.deleteById(id);
+        return true;
     }
 
-    public Comment updateComments(int id, int adPk, CreateComment createComment) {
-        // проверка авторизации
-        // ...
-
+    public CommentDTO updateComments(int id, int adPk, CommentDTO commentDTO) {
         Ads ads = adsRepository.findById(adPk).orElse(null);
         if (ads == null) return null;
 
         Comment comment = commentRepository.findById(id).orElse(null);
         if (comment == null) return null;
 
-        comment.setText(createComment.getText());
+        comment.setText(commentDTO.getText());
         comment.setCreatedAt(System.currentTimeMillis());
         comment = commentRepository.save(comment);
-        return comment;
+        return getCommentDTO(comment);
     }
 
     private ResponseWrapperComment getResponseWrapperCommentDTO(List<Comment> comments) {
         ResponseWrapperComment responseWrapperComment = new ResponseWrapperComment();
         responseWrapperComment.setCount(comments.size());
-        responseWrapperComment.setResults(comments);
+
+        List<CommentDTO> commentDTOList = new ArrayList<>();
+        for (Comment item : comments) {
+            commentDTOList.add(getCommentDTO(item));
+        }
+        responseWrapperComment.setResults(commentDTOList);
         return responseWrapperComment;
     }
 
-    private Comment createCommentDTO(CreateComment createComment) {
-        Comment comment = new Comment();
-        comment.setText(createComment.getText());
-        comment.setCreatedAt(System.currentTimeMillis());
-        return comment;
+    private CommentDTO getCommentDTO(Comment comment) {
+        CommentDTO commentDTO = new CommentDTO();
+        if (comment == null) return commentDTO;
+        commentDTO.setPk(comment.getPk());
+        commentDTO.setAuthor(comment.getAuthor().getId());
+        commentDTO.setAuthorImage(comment.getAuthor().getImage());
+        commentDTO.setAuthorFirstName(comment.getAuthor().getFirstName());
+        commentDTO.setCreatedAt(comment.getCreatedAt());
+        commentDTO.setText(comment.getText());
+        return commentDTO;
     }
 }

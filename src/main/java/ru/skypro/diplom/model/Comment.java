@@ -14,15 +14,11 @@ public class Comment {
     @JoinColumn(name = "author_id")
     private User author;
 
-    private String authorImage;
-
     @ManyToOne
     @JoinColumn(name = "ads_id")
     private Ads ads;
 
     private long createdAt;
-
-    private String authorFirstName;
     private String text;
 
     public Comment() {}
@@ -57,22 +53,6 @@ public class Comment {
 
     public void setCreatedAt(long createdAt) {
         this.createdAt = createdAt;
-    }
-
-    public String getAuthorImage() {
-        return authorImage;
-    }
-
-    public void setAuthorImage(String authorImage) {
-        this.authorImage = authorImage;
-    }
-
-    public String getAuthorFirstName() {
-        return authorFirstName;
-    }
-
-    public void setAuthorFirstName(String authorFirstName) {
-        this.authorFirstName = authorFirstName;
     }
 
     public String getText() {

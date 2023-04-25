@@ -48,15 +48,15 @@ public class AdsController {
     }
 
     @GetMapping("/{adPk}/comments")
-    public ResponseEntity<ResponseWrapperComment> getComments(@PathVariable Integer adPk) {
+    public ResponseEntity<ResponseWrapperComment> getComments(@PathVariable int adPk) {
         ResponseWrapperComment responseWrapperComment = commentService.getComments(adPk);
         if (responseWrapperComment == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         return ResponseEntity.ok(responseWrapperComment);
     }
 
     @PostMapping("/{adPk}/comments")
-    public ResponseEntity<Comment> addComments(@RequestBody CreateComment createComment, @PathVariable int adPk) {
-        Comment comment = commentService.addComment(createComment, adPk);
+    public ResponseEntity<CommentDTO> addComments(@RequestBody CommentDTO commentDTO, @PathVariable int adPk) {
+        CommentDTO comment = commentService.addComment(commentDTO, adPk);
         if (comment == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         return ResponseEntity.ok(comment);
     }
@@ -90,23 +90,17 @@ public class AdsController {
 
     @DeleteMapping("/{adPk}/comments/{id}")
     public ResponseEntity<Void> deleteComments(@PathVariable int id, @PathVariable int adPk) {
-        commentService.deleteComments(id, adPk);
-        return ResponseEntity.ok().build();
+        if (!commentService.deleteComments(id, adPk)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } else {
+            return ResponseEntity.ok().build();
+        }
     }
 
     @PatchMapping("/{adPk}/comments/{id}")
-    public ResponseEntity<Comment> updateComments(@PathVariable int id, @PathVariable int adPk, @RequestBody CreateComment createComment) {
-        Comment comment = commentService.updateComments(id, adPk, createComment);
+    public ResponseEntity<CommentDTO> updateComments(@PathVariable int id, @PathVariable int adPk, @RequestBody CommentDTO commentDTO) {
+        CommentDTO comment = commentService.updateComments(id, adPk, commentDTO);
         if (comment == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         return ResponseEntity.ok(comment);
     }
-
-//    @PatchMapping("/image/{id}")
-//    public ResponseEntity<MultipartFile> updateImage(@PathVariable int id, @RequestPart(value = "image") MultipartFile file) throws IOException {
-//        if (!adsService.updateImage(id, file.getBytes())) {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-//        }
-//        return ResponseEntity.ok(file);
-//    }
-
 }

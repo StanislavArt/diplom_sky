@@ -3,7 +3,6 @@ package ru.skypro.diplom.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.web.context.annotation.SessionScope;
 import ru.skypro.diplom.dto.CommentDTO;
 import ru.skypro.diplom.dto.ResponseWrapperComment;
 import ru.skypro.diplom.model.Ads;
@@ -15,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@SessionScope
 public class CommentService {
 
     private final CommentRepository commentRepository;
@@ -31,16 +29,16 @@ public class CommentService {
 
     public ResponseWrapperComment getComments(int adsPk) {
         Ads ads = adsRepository.findById(adsPk).orElse(null);
-        if (ads == null) return null;
+        if (ads == null) { return null; }
 
         List<Comment> comments = commentRepository.findAllByAds(ads);
-        if (comments.isEmpty()) return null;
+        if (comments.isEmpty()) { return null; }
         return getResponseWrapperCommentDTO(comments);
     }
 
     public CommentDTO addComment(CommentDTO commentDTO, int adPk) {
         Ads ads = adsRepository.findById(adPk).orElse(null);
-        if (ads == null) return null;
+        if (ads == null) { return null; }
 
         Comment comment = new Comment();
         comment.setAds(ads);
@@ -48,23 +46,22 @@ public class CommentService {
         comment.setCreatedAt(System.currentTimeMillis());
         comment.setText(commentDTO.getText());
         comment = commentRepository.save(comment);
-        if (comment == null) logger.error("Write error into database (function 'addComment()'");
         return getCommentDTO(comment);
     }
 
     public Comment getComment(int id, int adPk) {
         Ads ads = adsRepository.findById(adPk).orElse(null);
-        if (ads == null) return null;
+        if (ads == null) { return null; }
         Comment comment = commentRepository.findById(id).orElse(null);
         return comment;
     }
 
     public boolean deleteComments(int id, int adPk) {
         Ads ads = adsRepository.findById(adPk).orElse(null);
-        if (ads == null) return false;
+        if (ads == null) { return false; }
 
         Comment comment = commentRepository.findById(id).orElse(null);
-        if (comment == null) return false;
+        if (comment == null) { return false; }
 
         commentRepository.deleteById(id);
         return true;
@@ -72,10 +69,10 @@ public class CommentService {
 
     public CommentDTO updateComments(int id, int adPk, CommentDTO commentDTO) {
         Ads ads = adsRepository.findById(adPk).orElse(null);
-        if (ads == null) return null;
+        if (ads == null) { return null; }
 
         Comment comment = commentRepository.findById(id).orElse(null);
-        if (comment == null) return null;
+        if (comment == null) { return null; }
 
         comment.setText(commentDTO.getText());
         comment.setCreatedAt(System.currentTimeMillis());
@@ -97,7 +94,7 @@ public class CommentService {
 
     private CommentDTO getCommentDTO(Comment comment) {
         CommentDTO commentDTO = new CommentDTO();
-        if (comment == null) return commentDTO;
+        if (comment == null) { return commentDTO; }
         commentDTO.setPk(comment.getPk());
         commentDTO.setAuthor(comment.getAuthor().getId());
         commentDTO.setAuthorImage(comment.getAuthor().getImage());

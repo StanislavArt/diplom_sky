@@ -64,15 +64,6 @@ public class Ads {
     public void setPrice(int price) {
         this.price = price;
     }
-
-//    public Set<Image> getImages() {
-//        return images;
-//    }
-//
-//    public void setImages(Set<Image> images) {
-//        this.images = images;
-//    }
-
     public String getImage() {
         return image;
     }

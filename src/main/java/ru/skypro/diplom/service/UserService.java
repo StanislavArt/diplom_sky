@@ -38,7 +38,6 @@ public class UserService {
         user.setPhone(userUpd.getPhone());
 
         user = userRepository.save(user);
-        if (user == null) logger.error("Write error into database (function 'updateUser()'");
         return getUserDTO(user);
     }
 
@@ -56,8 +55,8 @@ public class UserService {
     public boolean changePassword(NewPassword newPassword) {
         User user = getCurrentUser();
 
-        if (!user.getPassword().equals(newPassword.getCurrentPassword())) return false;
-        if (user.getPassword().equals(newPassword.getNewPassword())) return false;
+        if (!user.getPassword().equals(newPassword.getCurrentPassword())) { return false; }
+        if (user.getPassword().equals(newPassword.getNewPassword())) { return false; }
 
         user.setPassword(newPassword.getNewPassword());
         user = userRepository.save(user);

@@ -21,10 +21,6 @@ public class User {
 
     private String email;
     private String phone;
-
-//    @Column(name = "reg_date")
-//    private String regDate;
-//    private String city;
     private String image;
 
     private String username;
@@ -87,23 +83,6 @@ public class User {
     public void setPhone(String phone) {
         this.phone = phone;
     }
-
-//    public String getRegDate() {
-//        return regDate;
-//    }
-//
-//    public void setRegDate(String regDate) {
-//        this.regDate = regDate;
-//    }
-
-//    public String getCity() {
-//        return city;
-//    }
-//
-//    public void setCity(String city) {
-//        this.city = city;
-//    }
-
     public String getImage() {
         return image;
     }
@@ -164,7 +143,6 @@ public class User {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        //return id == user.id && Objects.equals(firstName, user.firstName) && Objects.equals(lastName, user.lastName) && Objects.equals(email, user.email) && Objects.equals(phone, user.phone) && Objects.equals(regDate, user.regDate) && Objects.equals(city, user.city);
         return id == user.id && Objects.equals(firstName, user.firstName) && Objects.equals(lastName, user.lastName) && Objects.equals(email, user.email) && Objects.equals(phone, user.phone) && Objects.equals(username, user.username) && Objects.equals(password, user.password);
     }
 

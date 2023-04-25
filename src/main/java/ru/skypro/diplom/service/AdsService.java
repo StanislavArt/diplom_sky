@@ -2,8 +2,8 @@ package ru.skypro.diplom.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.context.annotation.SessionScope;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.diplom.dto.CreateAds;
 import ru.skypro.diplom.dto.FullAds;
@@ -13,17 +13,22 @@ import ru.skypro.diplom.model.Ads;
 import ru.skypro.diplom.model.User;
 import ru.skypro.diplom.repository.AdsRepository;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
 @Service
-@SessionScope
 public class AdsService {
     private final AdsRepository adsRepository;
     private final UserService userService;
     private final Logger logger = LoggerFactory.getLogger(AdsService.class);
+
+    @Value("${diplom.storage}")
+    private String storagePath;
 
     public AdsService(AdsRepository adsRepository, UserService userService) {
         this.adsRepository = adsRepository;
@@ -32,46 +37,42 @@ public class AdsService {
 
     public ResponseWrapperAds getAllAds() {
        List<Ads> adsList = adsRepository.findAll();
-       ResponseWrapperAds responseWrapperAds = getResponseWrapperAdsDTO(adsList);
-       return responseWrapperAds;
+        return getResponseWrapperAdsDTO(adsList);
     }
 
     public ResponseWrapperAds getAds() {
         User user = userService.getCurrentUser();
-        if (user == null) return null;
+        if (user == null) { return null; }
         List<Ads> adsList = adsRepository.findAllByAuthor(userService.getCurrentUser());
         return getResponseWrapperAdsDTO(adsList);
     }
 
-    public ResponseAds addAds(CreateAds createAds, byte[] image) {
+    public ResponseAds addAds(CreateAds createAds, MultipartFile file) {
         User user = userService.getCurrentUser();
-        if (user == null) return null;
+        if (user == null) { return null; }
+        if (!writeFile(file)) { return null; }
         Ads ads = new Ads();
         ads.setTitle(createAds.getTitle());
         ads.setDescription(createAds.getDescription());
         ads.setPrice(createAds.getPrice());
         ads.setAuthor(user);
-        //ads.setImage(new String(image));
-        ads.setImage("Picture");
+        ads.setImage(file.getOriginalFilename());
 
         Ads adsDB = adsRepository.save(ads);
-        if (adsDB == null) logger.error("Write error into database (function 'addAds()'");
-        ResponseAds responseAds = createAdsDTO(adsDB);
-        return responseAds;
+        return createAdsDTO(adsDB);
     }
 
     public FullAds getFullAd(int id) {
         Ads ads = adsRepository.findById(id).orElse(null);
-        if (ads == null) return null;
+        if (ads == null) { return null; }
         return getFullAdsDTO(ads);
     }
 
     public ResponseAds updateAds(int id, CreateAds createAds) {
         Ads ads = adsRepository.findById(id).orElse(null);
-        if (ads == null) return null;
+        if (ads == null) { return null; }
         updateAdsDTO(ads, createAds);
         ads = adsRepository.save(ads);
-        if (ads == null) logger.error("Write error into database (function 'updateAds()'");
         return createAdsDTO(ads);
     }
 
@@ -82,13 +83,30 @@ public class AdsService {
     public List<String> updateAdsImage(int AdPk, MultipartFile file) {
         List<String> images = new ArrayList<>();
         Ads ads = adsRepository.findById(AdPk).orElse(null);
-        if (ads == null) return images;
-
-        // сохранить картинку на диске
-
-        // записать путь в БД
-
+        if (ads == null) { return images; }
+        if (!writeFile(file)) { return images; }
+        ads.setImage(file.getOriginalFilename());
+        adsRepository.save(ads);
+        try {
+            images.add(new String(file.getBytes()));
+        } catch (IOException e) {
+            logger.error("Error InputStream in function 'updateAdsImage()'");
+            logger.error(Arrays.toString(e.getStackTrace()));
+        }
         return images;
+    }
+
+    private boolean writeFile(MultipartFile file) {
+        try {
+            String fileName = file.getOriginalFilename();
+            File pathFile = new File(storagePath + fileName);
+            file.transferTo(pathFile);
+            return true;
+        } catch (IOException e) {
+            logger.error("Error writing file in function 'updateAdsImage()'");
+            logger.error(Arrays.toString(e.getStackTrace()));
+            return false;
+        }
     }
 
     private ResponseWrapperAds getResponseWrapperAdsDTO(List<Ads> adsList) {
@@ -113,18 +131,18 @@ public class AdsService {
         fullAds.setAuthorLastName(ads.getAuthor().getLastName());
         fullAds.setEmail(ads.getAuthor().getEmail());
         fullAds.setPhone(ads.getAuthor().getPhone());
-        fullAds.setImage(ads.getImage());
+        fullAds.setImage(transferFileToString(ads.getImage()));
         return fullAds;
     }
 
     private ResponseAds createAdsDTO(Ads ads) {
         ResponseAds responseAds = new ResponseAds();
-        if (ads == null) return responseAds;
+        if (ads == null) { return responseAds; }
         responseAds.setPk(ads.getPk());
         responseAds.setTitle(ads.getTitle());
         responseAds.setAuthor(ads.getAuthor().getId());
         responseAds.setPrice(ads.getPrice());
-        responseAds.setImage(ads.getImage());
+        responseAds.setImage(transferFileToString(ads.getImage()));
         return responseAds;
     }
 
@@ -134,6 +152,16 @@ public class AdsService {
         ads.setPrice(createAds.getPrice());
     }
 
-
+    private String transferFileToString(String fileName) {
+        if (fileName.isEmpty()) { return ""; }
+        try {
+            byte[] array = Files.readAllBytes(Paths.get(storagePath + fileName));
+            return new String(array);
+        } catch (IOException e) {
+            logger.error("Error reading file in function 'transferFileToString()'");
+            logger.error(Arrays.toString(e.getStackTrace()));
+            return "";
+        }
+    }
 
 }

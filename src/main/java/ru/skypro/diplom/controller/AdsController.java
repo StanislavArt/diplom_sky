@@ -5,20 +5,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.diplom.dto.*;
-import ru.skypro.diplom.model.Ads;
 import ru.skypro.diplom.model.Comment;
-import ru.skypro.diplom.model.User;
 import ru.skypro.diplom.service.AdsService;
 import ru.skypro.diplom.service.CommentService;
 
-import java.io.IOException;
 import java.util.List;
 
 @RestController
 @RequestMapping("ads")
-//@CrossOrigin(value = "http://192.168.99.100:3000")
+@CrossOrigin(value = "http://192.168.99.100:3000")
 //@CrossOrigin(value = "http://192.168.0.152:3000")
-@CrossOrigin(value = "http://localhost:3000")
+//@CrossOrigin(value = "http://localhost:3000")
 public class AdsController {
     private final AdsService adsService;
     private final CommentService commentService;
@@ -31,13 +28,12 @@ public class AdsController {
     @GetMapping
     public ResponseEntity<ResponseWrapperAds> getAllAds() {
         ResponseWrapperAds responseWrapperAds = adsService.getAllAds();
-        ResponseEntity<ResponseWrapperAds> res = ResponseEntity.ok(responseWrapperAds);
         return ResponseEntity.ok(responseWrapperAds);
     }
 
     @PostMapping
-    public ResponseEntity<ResponseAds> addAds(@RequestPart(value = "properties") CreateAds createAds, @RequestPart(value = "image") MultipartFile file) throws IOException {
-        ResponseAds ads = adsService.addAds(createAds, file.getBytes());
+    public ResponseEntity<ResponseAds> addAds(@RequestPart(value = "properties") CreateAds createAds, @RequestPart(value = "image") MultipartFile file) {
+        ResponseAds ads = adsService.addAds(createAds, file);
         if (ads == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         return ResponseEntity.ok(ads);
     }
@@ -82,7 +78,7 @@ public class AdsController {
         return ResponseEntity.ok(responseAds);
     }
 
-    @GetMapping("/{adPK}/comments/{id}")
+    @GetMapping("/{adPk}/comments/{id}")
     public ResponseEntity<Comment> getComment(@PathVariable int id, @PathVariable int adPk) {
         Comment comment = commentService.getComment(id, adPk);
         if (comment == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -107,7 +103,7 @@ public class AdsController {
 
     @PatchMapping("/{adPk}/image")
     public ResponseEntity<List<String>> updateAdsImage(@PathVariable int adPk, @RequestPart(value = "image") MultipartFile file) {
-
-        return ResponseEntity.ok().build();
+        List<String> images = adsService.updateAdsImage(adPk, file);
+        return ResponseEntity.ok(images);
     }
 }

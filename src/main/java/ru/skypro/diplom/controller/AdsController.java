@@ -12,6 +12,7 @@ import ru.skypro.diplom.service.AdsService;
 import ru.skypro.diplom.service.CommentService;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping("ads")
@@ -75,10 +76,10 @@ public class AdsController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Ads> updateAds(@PathVariable int id, @RequestBody CreateAds createAds) {
-        Ads ads = adsService.updateAds(id, createAds);
-        if (ads == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        return ResponseEntity.ok(ads);
+    public ResponseEntity<ResponseAds> updateAds(@PathVariable int id, @RequestBody CreateAds createAds) {
+        ResponseAds responseAds = adsService.updateAds(id, createAds);
+        if (responseAds == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        return ResponseEntity.ok(responseAds);
     }
 
     @GetMapping("/{adPK}/comments/{id}")
@@ -102,5 +103,11 @@ public class AdsController {
         CommentDTO comment = commentService.updateComments(id, adPk, commentDTO);
         if (comment == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         return ResponseEntity.ok(comment);
+    }
+
+    @PatchMapping("/{adPk}/image")
+    public ResponseEntity<List<String>> updateAdsImage(@PathVariable int adPk, @RequestPart(value = "image") MultipartFile file) {
+
+        return ResponseEntity.ok().build();
     }
 }

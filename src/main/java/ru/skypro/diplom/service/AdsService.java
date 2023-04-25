@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.SessionScope;
+import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.diplom.dto.CreateAds;
 import ru.skypro.diplom.dto.FullAds;
 import ru.skypro.diplom.dto.ResponseAds;
@@ -65,33 +66,30 @@ public class AdsService {
         return getFullAdsDTO(ads);
     }
 
-    public Ads updateAds(int id, CreateAds createAds) {
-        // проверка на авторизацию
-        // ...
-
+    public ResponseAds updateAds(int id, CreateAds createAds) {
         Ads ads = adsRepository.findById(id).orElse(null);
         if (ads == null) return null;
         updateAdsDTO(ads, createAds);
         ads = adsRepository.save(ads);
         if (ads == null) logger.error("Write error into database (function 'updateAds()'");
-        return ads;
+        return createAdsDTO(ads);
     }
 
     public void removeAds(int id) {
-        // проверка на авторизацию
-        // ...
-
         adsRepository.deleteById(id);
     }
 
-//    public boolean updateImage(int id, byte[] data) {
-//        Image image = imageRepository.findById(id).orElse(null);
-//        if (image == null) return false;
-//
-//        image.setData(new String(data));
-//        imageRepository.save(image);
-//        return true;
-//    }
+    public List<String> updateAdsImage(int AdPk, MultipartFile file) {
+        List<String> images = new ArrayList<>();
+        Ads ads = adsRepository.findById(AdPk).orElse(null);
+        if (ads == null) return images;
+
+        // сохранить картинку на диске
+
+        // записать путь в БД
+
+        return images;
+    }
 
     private ResponseWrapperAds getResponseWrapperAdsDTO(List<Ads> adsList) {
         ResponseWrapperAds responseWrapperAds = new ResponseWrapperAds();
@@ -120,8 +118,8 @@ public class AdsService {
     }
 
     private ResponseAds createAdsDTO(Ads ads) {
-        if (ads == null) return null;
         ResponseAds responseAds = new ResponseAds();
+        if (ads == null) return responseAds;
         responseAds.setPk(ads.getPk());
         responseAds.setTitle(ads.getTitle());
         responseAds.setAuthor(ads.getAuthor().getId());

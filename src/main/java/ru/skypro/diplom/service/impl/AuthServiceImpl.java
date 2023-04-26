@@ -8,6 +8,7 @@ import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
 import ru.skypro.diplom.dto.RegisterReq;
 import ru.skypro.diplom.enums.Role;
+import ru.skypro.diplom.repository.UserRepository;
 import ru.skypro.diplom.service.AuthService;
 import ru.skypro.diplom.service.UserService;
 
@@ -18,12 +19,12 @@ public class AuthServiceImpl implements AuthService {
 
     private final PasswordEncoder encoder;
 
-    private final UserService userService;
+    private final UserRepository userRepository;
 
-    public AuthServiceImpl(UserDetailsManager manager, UserService userService) {
+    public AuthServiceImpl(UserDetailsManager manager, UserRepository userRepository) {
         this.manager = manager;
         this.encoder = new BCryptPasswordEncoder();
-        this.userService = userService;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -35,15 +36,6 @@ public class AuthServiceImpl implements AuthService {
         UserDetails userDetails = manager.loadUserByUsername(userName);
         String encryptedPassword = userDetails.getPassword();
         String encryptedPasswordWithoutEncryptionType = encryptedPassword.substring(8);
-
-        ru.skypro.diplom.model.User user = userService.findByCredentials(userName, password);
-        if (user == null) {
-            user = userService.getCurrentUser();
-            user.setUsername(userName);
-            user.setPassword(password);
-            user.setEmail(userName);
-        }
-        userService.setCurrentUser(user);
 
         return encoder.matches(password, encryptedPasswordWithoutEncryptionType);
     }
@@ -60,6 +52,17 @@ public class AuthServiceImpl implements AuthService {
                         .roles(role.name())
                         .build()
         );
+
+        ru.skypro.diplom.model.User user = new ru.skypro.diplom.model.User();
+        user.setUsername(registerReq.getUsername());
+        user.setPassword(encoder.encode(registerReq.getPassword()));
+        user.setEmail(registerReq.getUsername());
+        user.setFirstName(registerReq.getFirstName());
+        user.setLastName(registerReq.getLastName());
+        user.setPhone(registerReq.getPhone());
+        user.setRole(role);
+        userRepository.save(user);
+
         return true;
     }
 }

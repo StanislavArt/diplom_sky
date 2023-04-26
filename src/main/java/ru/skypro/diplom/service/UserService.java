@@ -2,6 +2,9 @@ package ru.skypro.diplom.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
 import ru.skypro.diplom.dto.NewPassword;
 import ru.skypro.diplom.dto.UserDTO;
@@ -12,10 +15,12 @@ import ru.skypro.diplom.repository.UserRepository;
 public class UserService {
     private final UserRepository userRepository;
     private final Logger logger = LoggerFactory.getLogger(UserService.class);
+    private final UserDetailsManager manager;
     private User currentUser;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, UserDetailsManager manager) {
         this.userRepository = userRepository;
+        this.manager = manager;
         this.currentUser = new User();
     }
 
@@ -28,6 +33,8 @@ public class UserService {
     }
 
     public UserDTO getUser() {
+
+
         return getUserDTO(getCurrentUser());
     }
 
@@ -67,10 +74,6 @@ public class UserService {
         return false;
     }
 
-    public User findByCredentials(String userName, String password) {
-        return userRepository.findUserOptionalByUsernameAndPassword(userName, password).orElse(null);
-    }
-
     private UserDTO getUserDTO(User user) {
         UserDTO userDTO = new UserDTO();
         if (user == null ) { return userDTO; }
@@ -81,6 +84,13 @@ public class UserService {
         userDTO.setPhone(user.getPhone());
         userDTO.setImage(user.getImage());
         return userDTO;
+    }
+
+    public HttpStatus verifyAuthority(Authentication authentication) {
+        org.springframework.security.core.userdetails.User user = (org.springframework.security.core.userdetails.User) authentication.getPrincipal();
+        if (!manager.userExists(user.getUsername())) { return HttpStatus.NOT_FOUND; }
+        if (!authentication.isAuthenticated()) { return HttpStatus.UNAUTHORIZED; }
+        return HttpStatus.OK;
     }
 
 }

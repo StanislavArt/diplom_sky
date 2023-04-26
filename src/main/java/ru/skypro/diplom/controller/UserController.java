@@ -2,12 +2,15 @@ package ru.skypro.diplom.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.diplom.dto.*;
 import ru.skypro.diplom.model.User;
 import ru.skypro.diplom.service.UserService;
 
+import javax.annotation.security.RolesAllowed;
 import java.io.IOException;
 
 @RestController
@@ -35,13 +38,14 @@ public class UserController {
         return ResponseEntity.ok("User's password is changed");
     }
 
+    @RolesAllowed("USER")
     @GetMapping("/me")
-    public ResponseEntity<UserDTO> getUser() {
-        User user = userService.getCurrentUser();
-        if (user == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    //@Secured({"ROLE_USER", "USER"})
+    public ResponseEntity<UserDTO> getUser(Authentication auth) {
         return ResponseEntity.ok(userService.getUser());
     }
 
+    @RolesAllowed("ROLE_USER")
     @PatchMapping ("/me")
     public ResponseEntity<UserDTO> updateUser(@RequestBody UserDTO userUpd ) {
         User user = userService.getCurrentUser();

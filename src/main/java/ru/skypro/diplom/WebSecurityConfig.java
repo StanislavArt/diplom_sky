@@ -5,6 +5,7 @@ import org.springframework.context.annotation.*;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.*;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
@@ -13,8 +14,9 @@ import org.springframework.security.web.SecurityFilterChain;
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
-@EnableGlobalMethodSecurity(jsr250Enabled = true, prePostEnabled = true, securedEnabled = true)
-public class WebSecurityConfig extends GlobalMethodSecurityConfiguration {
+//@EnableGlobalMethodSecurity(jsr250Enabled = true, prePostEnabled = true, securedEnabled = true)
+@EnableWebSecurity
+public class WebSecurityConfig {
 
     private static final String[] AUTH_WHITELIST = {
             "/swagger-resources/**",
@@ -44,7 +46,8 @@ public class WebSecurityConfig extends GlobalMethodSecurityConfiguration {
                                 .mvcMatchers("/ads/**", "/users/**").authenticated()
 
                 )
-                .cors().disable()
+                //.cors().disable()
+                .cors().and()
                 .httpBasic(withDefaults());
         return http.build();
     }

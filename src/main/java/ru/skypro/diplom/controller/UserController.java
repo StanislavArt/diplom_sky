@@ -15,9 +15,9 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping("users")
-//@CrossOrigin(value = "http://192.168.99.100:3000")
+@CrossOrigin(value = "http://192.168.99.100:3000")
 //@CrossOrigin(value = "http://192.168.0.152:3000")
-@CrossOrigin(value = "http://localhost:3000")
+//@CrossOrigin(value = "http://localhost:3000")
 public class UserController {
 
     private final UserService userService;
@@ -38,14 +38,12 @@ public class UserController {
         return ResponseEntity.ok("User's password is changed");
     }
 
-    @RolesAllowed("USER")
     @GetMapping("/me")
-    //@Secured({"ROLE_USER", "USER"})
+    @Secured("ROLE_USER")
     public ResponseEntity<UserDTO> getUser(Authentication auth) {
         return ResponseEntity.ok(userService.getUser());
     }
 
-    @RolesAllowed("ROLE_USER")
     @PatchMapping ("/me")
     public ResponseEntity<UserDTO> updateUser(@RequestBody UserDTO userUpd ) {
         User user = userService.getCurrentUser();

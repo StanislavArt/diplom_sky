@@ -13,9 +13,9 @@ import java.util.List;
 
 @RestController
 @RequestMapping("ads")
-//@CrossOrigin(value = "http://192.168.99.100:3000")
+@CrossOrigin(value = "http://192.168.99.100:3000")
 //@CrossOrigin(value = "http://192.168.0.152:3000")
-@CrossOrigin(value = "http://localhost:3000")
+//@CrossOrigin(value = "http://localhost:3000")
 public class AdsController {
     private final AdsService adsService;
     private final CommentService commentService;
@@ -27,8 +27,9 @@ public class AdsController {
 
     @GetMapping
     public ResponseEntity<ResponseWrapperAds> getAllAds() {
-        ResponseWrapperAds responseWrapperAds = adsService.getAllAds();
-        return ResponseEntity.ok(responseWrapperAds);
+        //ResponseWrapperAds responseWrapperAds = adsService.getAllAds();
+        //return ResponseEntity.ok(responseWrapperAds);
+        return ResponseEntity.ok(new ResponseWrapperAds());
     }
 
     @PostMapping
@@ -40,8 +41,9 @@ public class AdsController {
 
     @GetMapping("/me")
     public ResponseEntity<ResponseWrapperAds> getAds() {
-        ResponseWrapperAds responseWrapperAds = adsService.getAds();
-        return ResponseEntity.ok(responseWrapperAds);
+//        ResponseWrapperAds responseWrapperAds = adsService.getAds();
+//        return ResponseEntity.ok(responseWrapperAds);
+        return ResponseEntity.ok(new ResponseWrapperAds());
     }
 
     @GetMapping("/{adPk}/comments")

@@ -1,6 +1,8 @@
 package ru.skypro.diplom.controller;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
@@ -34,22 +36,22 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/me")
+    @GetMapping(value = "/me")
     public ResponseEntity<UserDTO> getUser(Authentication auth) {
         UserDTO userDTO = userService.getUser(auth);
         if (userDTO == null) { return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); }
         return ResponseEntity.ok(userDTO);
     }
 
-    @PatchMapping ("/me")
+    @PatchMapping (value = "/me")
     public ResponseEntity<UserDTO> updateUser(@RequestBody UserDTO userUpd, Authentication auth) {
         UserDTO userDTO = userService.updateUser(userUpd, auth);
         if (userDTO == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         return ResponseEntity.ok(userDTO);
     }
 
-    @PatchMapping ("/me/image")
-    public ResponseEntity<String> updateUserImage(@RequestPart(value = "image") MultipartFile file, Authentication auth) throws IOException {
+    @PatchMapping (value = "/me/image", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    public ResponseEntity<Void> updateUserImage(@RequestPart(value = "image") MultipartFile file, Authentication auth) throws IOException {
         if (!userService.updateUserImage(file, auth)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }

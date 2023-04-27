@@ -94,7 +94,8 @@ public class UserService {
         userDTO.setPhone(user.getPhone());
 
         String imagePath = user.getImage() ==  null ? "" : user.getImage();
-        userDTO.setImage(transferFileToString(imagePath));
+        String image = transferFileToString(imagePath);
+        userDTO.setImage(image);
         return userDTO;
     }
 
@@ -125,7 +126,7 @@ public class UserService {
         } catch (IOException e) {
             logger.error("Error reading file in function 'transferFileToString()'");
             logger.error(Arrays.toString(e.getStackTrace()));
-            return "";
+            return new String();
         }
     }
 

@@ -121,7 +121,8 @@ public class AdsService {
         fullAds.setAuthorLastName(ads.getAuthor().getLastName());
         fullAds.setEmail(ads.getAuthor().getEmail());
         fullAds.setPhone(ads.getAuthor().getPhone());
-        fullAds.setImage(userService.transferFileToString(ads.getImage()));
+        //fullAds.setImage(userService.transferFileToString(ads.getImage()));
+        fullAds.setImage("");
         return fullAds;
     }
 
@@ -132,7 +133,8 @@ public class AdsService {
         responseAds.setTitle(ads.getTitle());
         responseAds.setAuthor(ads.getAuthor().getId());
         responseAds.setPrice(ads.getPrice());
-        responseAds.setImage(userService.transferFileToString(ads.getImage()));
+        //responseAds.setImage(userService.transferFileToString(ads.getImage()));
+        responseAds.setImage("");
         return responseAds;
     }
 

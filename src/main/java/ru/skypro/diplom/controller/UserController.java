@@ -49,13 +49,10 @@ public class UserController {
     }
 
     @PatchMapping ("/me/image")
-    public ResponseEntity<String> updateUserImage(@RequestPart(value = "image") MultipartFile file) throws IOException {
-//        User user = userService.getCurrentUser();
-//        if (user == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-//
-//        if (!userService.updateUserImage(file.getBytes())) {
-//            return ResponseEntity.status(HttpStatus.CONFLICT).build();
-//        }
-        return ResponseEntity.ok("User's image is NOT changed!");
+    public ResponseEntity<String> updateUserImage(@RequestPart(value = "image") MultipartFile file, Authentication auth) throws IOException {
+        if (!userService.updateUserImage(file, auth)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        return ResponseEntity.ok().build();
     }
 }

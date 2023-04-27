@@ -28,8 +28,8 @@ public class AdsService {
     private final UserService userService;
     private final Logger logger = LoggerFactory.getLogger(AdsService.class);
 
-    @Value("${diplom.storage}")
-    private String storagePath;
+//    @Value("${diplom.storage}")
+//    private String storagePath;
 
     public AdsService(AdsRepository adsRepository, UserService userService) {
         this.adsRepository = adsRepository;
@@ -51,7 +51,7 @@ public class AdsService {
     public ResponseAds addAds(CreateAds createAds, MultipartFile file, Authentication auth) {
         User user = userService.getUserFromAuthentication(auth);
         if (user == null) { return null; }
-        if (!writeFile(file)) { return null; }
+        if (!userService.writeFile(file)) { return null; }
         Ads ads = new Ads();
         ads.setTitle(createAds.getTitle());
         ads.setDescription(createAds.getDescription());
@@ -85,7 +85,7 @@ public class AdsService {
         List<String> images = new ArrayList<>();
         Ads ads = adsRepository.findById(adPk).orElse(null);
         if (ads == null) { return images; }
-        if (!writeFile(file)) { return images; }
+        if (!userService.writeFile(file)) { return images; }
         ads.setImage(file.getOriginalFilename());
         adsRepository.save(ads);
         try {
@@ -97,18 +97,7 @@ public class AdsService {
         return images;
     }
 
-    private boolean writeFile(MultipartFile file) {
-        try {
-            String fileName = file.getOriginalFilename();
-            File pathFile = new File(storagePath + fileName);
-            file.transferTo(pathFile);
-            return true;
-        } catch (IOException e) {
-            logger.error("Error writing file in function 'updateAdsImage()'");
-            logger.error(Arrays.toString(e.getStackTrace()));
-            return false;
-        }
-    }
+
 
     private ResponseWrapperAds getResponseWrapperAdsDTO(List<Ads> adsList) {
         ResponseWrapperAds responseWrapperAds = new ResponseWrapperAds();
@@ -132,7 +121,7 @@ public class AdsService {
         fullAds.setAuthorLastName(ads.getAuthor().getLastName());
         fullAds.setEmail(ads.getAuthor().getEmail());
         fullAds.setPhone(ads.getAuthor().getPhone());
-        fullAds.setImage(transferFileToString(ads.getImage()));
+        fullAds.setImage(userService.transferFileToString(ads.getImage()));
         return fullAds;
     }
 
@@ -143,7 +132,7 @@ public class AdsService {
         responseAds.setTitle(ads.getTitle());
         responseAds.setAuthor(ads.getAuthor().getId());
         responseAds.setPrice(ads.getPrice());
-        responseAds.setImage(transferFileToString(ads.getImage()));
+        responseAds.setImage(userService.transferFileToString(ads.getImage()));
         return responseAds;
     }
 
@@ -153,16 +142,6 @@ public class AdsService {
         ads.setPrice(createAds.getPrice());
     }
 
-    private String transferFileToString(String fileName) {
-        if (fileName.isEmpty()) { return ""; }
-        try {
-            byte[] array = Files.readAllBytes(Paths.get(storagePath + fileName));
-            return new String(array);
-        } catch (IOException e) {
-            logger.error("Error reading file in function 'transferFileToString()'");
-            logger.error(Arrays.toString(e.getStackTrace()));
-            return "";
-        }
-    }
+
 
 }

@@ -2,6 +2,7 @@ package ru.skypro.diplom.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -9,10 +10,17 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.diplom.dto.NewPassword;
 import ru.skypro.diplom.dto.UserDTO;
 import ru.skypro.diplom.model.User;
 import ru.skypro.diplom.repository.UserRepository;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Arrays;
 
 @Service
 public class UserService {
@@ -20,6 +28,9 @@ public class UserService {
     private final Logger logger = LoggerFactory.getLogger(UserService.class);
     private final UserDetailsManager manager;
     private final PasswordEncoder encoder;
+
+    @Value("${diplom.storage}")
+    private String storagePath;
 
     public UserService(UserRepository userRepository, UserDetailsManager manager) {
         this.userRepository = userRepository;
@@ -43,16 +54,12 @@ public class UserService {
         return getUserDTO(user);
     }
 
-    public boolean updateUserImage(byte[] data, Authentication auth) {
+    public boolean updateUserImage(MultipartFile file, Authentication auth) {
         User user = getUserFromAuthentication(auth);
         if (user == null) { return false; }
-
-        user.setImage(new String(data));
+        if (!writeFile(file)) { return false; }
+        user.setImage(file.getOriginalFilename());
         user = userRepository.save(user);
-        if (user == null) {
-            logger.error("Write error into database (function 'updateUser()'");
-            return false;
-        }
         return true;
     }
 
@@ -85,7 +92,9 @@ public class UserService {
         userDTO.setLastName(user.getLastName());
         userDTO.setEmail(user.getEmail());
         userDTO.setPhone(user.getPhone());
-        userDTO.setImage(user.getImage());
+
+        String imagePath = user.getImage() ==  null ? "" : user.getImage();
+        userDTO.setImage(transferFileToString(imagePath));
         return userDTO;
     }
 
@@ -93,6 +102,31 @@ public class UserService {
         String username = ((UserDetails) authentication.getPrincipal()).getUsername();
         User user = userRepository.findUserByUsername(username).orElse(null);
         return user;
+    }
+
+    public boolean writeFile(MultipartFile file) {
+        try {
+            String fileName = file.getOriginalFilename();
+            File pathFile = new File(storagePath + fileName);
+            file.transferTo(pathFile);
+            return true;
+        } catch (IOException e) {
+            logger.error("Error writing file in function 'updateAdsImage()'");
+            logger.error(Arrays.toString(e.getStackTrace()));
+            return false;
+        }
+    }
+
+    public String transferFileToString(String fileName) {
+        if (fileName.isEmpty()) { return new String(); }
+        try {
+            byte[] array = Files.readAllBytes(Paths.get(storagePath + fileName));
+            return new String(array);
+        } catch (IOException e) {
+            logger.error("Error reading file in function 'transferFileToString()'");
+            logger.error(Arrays.toString(e.getStackTrace()));
+            return "";
+        }
     }
 
 }

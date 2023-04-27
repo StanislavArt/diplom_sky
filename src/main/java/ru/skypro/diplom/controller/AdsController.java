@@ -28,9 +28,7 @@ public class AdsController {
 
     @GetMapping
     public ResponseEntity<ResponseWrapperAds> getAllAds() {
-        //ResponseWrapperAds responseWrapperAds = adsService.getAllAds();
-        //return ResponseEntity.ok(responseWrapperAds);
-        return ResponseEntity.ok(new ResponseWrapperAds());
+        return ResponseEntity.ok(adsService.getAllAds());
     }
 
     @PostMapping
@@ -41,10 +39,8 @@ public class AdsController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<ResponseWrapperAds> getAds() {
-//        ResponseWrapperAds responseWrapperAds = adsService.getAds();
-//        return ResponseEntity.ok(responseWrapperAds);
-        return ResponseEntity.ok(new ResponseWrapperAds());
+    public ResponseEntity<ResponseWrapperAds> getAds(Authentication auth) {
+        return ResponseEntity.ok(adsService.getAds(auth));
     }
 
     @GetMapping("/{adPk}/comments")

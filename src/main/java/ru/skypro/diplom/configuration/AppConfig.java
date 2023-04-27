@@ -4,9 +4,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.provisioning.UserDetailsManager;
+import ru.skypro.diplom.dto.LoadCred;
 import ru.skypro.diplom.model.User;
 import ru.skypro.diplom.repository.UserRepository;
 
+import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Configuration
@@ -22,8 +24,9 @@ public class AppConfig {
     /**
      * Загрузка пользователей из базы данных при запуске приложения
      */
-    @Bean
+    @PostConstruct
     public void loadCredentials() {
+        //List<LoadCred> users = userRepository.getListOfUsernameAndPasswordAndRole();
         List<User> users = userRepository.findAll();
         for (User user : users) {
             if (manager.userExists(user.getUsername())) { continue; }

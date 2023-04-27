@@ -2,11 +2,13 @@ package ru.skypro.diplom.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import ru.skypro.diplom.dto.CommentDTO;
 import ru.skypro.diplom.dto.ResponseWrapperComment;
 import ru.skypro.diplom.model.Ads;
 import ru.skypro.diplom.model.Comment;
+import ru.skypro.diplom.model.User;
 import ru.skypro.diplom.repository.AdsRepository;
 import ru.skypro.diplom.repository.CommentRepository;
 
@@ -36,13 +38,16 @@ public class CommentService {
         return getResponseWrapperCommentDTO(comments);
     }
 
-    public CommentDTO addComment(CommentDTO commentDTO, int adPk) {
+    public CommentDTO addComment(CommentDTO commentDTO, int adPk, Authentication auth) {
+        User user = userService.getUserFromAuthentication(auth);
+        if (user == null) { return null; }
+
         Ads ads = adsRepository.findById(adPk).orElse(null);
         if (ads == null) { return null; }
 
         Comment comment = new Comment();
         comment.setAds(ads);
-        comment.setAuthor(userService.getCurrentUser());
+        comment.setAuthor(user);
         comment.setCreatedAt(System.currentTimeMillis());
         comment.setText(commentDTO.getText());
         comment = commentRepository.save(comment);

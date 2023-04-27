@@ -3,6 +3,7 @@ package ru.skypro.diplom.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.diplom.dto.CreateAds;
@@ -40,15 +41,15 @@ public class AdsService {
         return getResponseWrapperAdsDTO(adsList);
     }
 
-    public ResponseWrapperAds getAds() {
-        User user = userService.getCurrentUser();
+    public ResponseWrapperAds getAds(Authentication auth) {
+        User user = userService.getUserFromAuthentication(auth);
         if (user == null) { return null; }
-        List<Ads> adsList = adsRepository.findAllByAuthor(userService.getCurrentUser());
+        List<Ads> adsList = adsRepository.findAllByAuthor(user);
         return getResponseWrapperAdsDTO(adsList);
     }
 
-    public ResponseAds addAds(CreateAds createAds, MultipartFile file) {
-        User user = userService.getCurrentUser();
+    public ResponseAds addAds(CreateAds createAds, MultipartFile file, Authentication auth) {
+        User user = userService.getUserFromAuthentication(auth);
         if (user == null) { return null; }
         if (!writeFile(file)) { return null; }
         Ads ads = new Ads();
@@ -80,9 +81,9 @@ public class AdsService {
         adsRepository.deleteById(id);
     }
 
-    public List<String> updateAdsImage(int AdPk, MultipartFile file) {
+    public List<String> updateAdsImage(int adPk, MultipartFile file) {
         List<String> images = new ArrayList<>();
-        Ads ads = adsRepository.findById(AdPk).orElse(null);
+        Ads ads = adsRepository.findById(adPk).orElse(null);
         if (ads == null) { return images; }
         if (!writeFile(file)) { return images; }
         ads.setImage(file.getOriginalFilename());

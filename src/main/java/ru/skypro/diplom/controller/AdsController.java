@@ -2,6 +2,7 @@ package ru.skypro.diplom.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.diplom.dto.*;
@@ -13,9 +14,9 @@ import java.util.List;
 
 @RestController
 @RequestMapping("ads")
-@CrossOrigin(value = "http://192.168.99.100:3000")
+//@CrossOrigin(value = "http://192.168.99.100:3000")
 //@CrossOrigin(value = "http://192.168.0.152:3000")
-//@CrossOrigin(value = "http://localhost:3000")
+@CrossOrigin(value = "http://localhost:3000")
 public class AdsController {
     private final AdsService adsService;
     private final CommentService commentService;
@@ -33,8 +34,8 @@ public class AdsController {
     }
 
     @PostMapping
-    public ResponseEntity<ResponseAds> addAds(@RequestPart(value = "properties") CreateAds createAds, @RequestPart(value = "image") MultipartFile file) {
-        ResponseAds ads = adsService.addAds(createAds, file);
+    public ResponseEntity<ResponseAds> addAds(@RequestPart(value = "properties") CreateAds createAds, @RequestPart(value = "image") MultipartFile file, Authentication auth) {
+        ResponseAds ads = adsService.addAds(createAds, file, auth);
         if (ads == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         return ResponseEntity.ok(ads);
     }
@@ -54,8 +55,8 @@ public class AdsController {
     }
 
     @PostMapping("/{adPk}/comments")
-    public ResponseEntity<CommentDTO> addComments(@RequestBody CommentDTO commentDTO, @PathVariable int adPk) {
-        CommentDTO comment = commentService.addComment(commentDTO, adPk);
+    public ResponseEntity<CommentDTO> addComments(@RequestBody CommentDTO commentDTO, @PathVariable int adPk, Authentication auth) {
+        CommentDTO comment = commentService.addComment(commentDTO, adPk, auth);
         if (comment == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         return ResponseEntity.ok(comment);
     }

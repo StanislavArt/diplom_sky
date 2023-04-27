@@ -15,9 +15,9 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping("users")
-@CrossOrigin(value = "http://192.168.99.100:3000")
+//@CrossOrigin(value = "http://192.168.99.100:3000")
 //@CrossOrigin(value = "http://192.168.0.152:3000")
-//@CrossOrigin(value = "http://localhost:3000")
+@CrossOrigin(value = "http://localhost:3000")
 public class UserController {
 
     private final UserService userService;
@@ -27,39 +27,35 @@ public class UserController {
     }
 
     @PostMapping("/set_password")
-    public ResponseEntity<String> setPassword(@RequestBody NewPassword newPassword ) {
-        User user = userService.getCurrentUser();
-        if (user == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-
-        if (!userService.changePassword(newPassword)) {
-            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
+    public ResponseEntity<Void> setPassword(@RequestBody NewPassword newPassword, Authentication auth) {
+        if (!userService.changePassword(newPassword, auth)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
-
-        return ResponseEntity.ok("User's password is changed");
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/me")
-    @Secured("ROLE_USER")
     public ResponseEntity<UserDTO> getUser(Authentication auth) {
-        return ResponseEntity.ok(userService.getUser());
+        UserDTO userDTO = userService.getUser(auth);
+        if (userDTO == null) { return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); }
+        return ResponseEntity.ok(userDTO);
     }
 
     @PatchMapping ("/me")
-    public ResponseEntity<UserDTO> updateUser(@RequestBody UserDTO userUpd ) {
-        User user = userService.getCurrentUser();
-        if (user == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        UserDTO userDTO = userService.updateUser(userUpd);
+    public ResponseEntity<UserDTO> updateUser(@RequestBody UserDTO userUpd, Authentication auth) {
+        UserDTO userDTO = userService.updateUser(userUpd, auth);
+        if (userDTO == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         return ResponseEntity.ok(userDTO);
     }
 
     @PatchMapping ("/me/image")
     public ResponseEntity<String> updateUserImage(@RequestPart(value = "image") MultipartFile file) throws IOException {
-        User user = userService.getCurrentUser();
-        if (user == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-
-        if (!userService.updateUserImage(file.getBytes())) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        }
-        return ResponseEntity.ok("User's image is changed!");
+//        User user = userService.getCurrentUser();
+//        if (user == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+//
+//        if (!userService.updateUserImage(file.getBytes())) {
+//            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+//        }
+        return ResponseEntity.ok("User's image is NOT changed!");
     }
 }

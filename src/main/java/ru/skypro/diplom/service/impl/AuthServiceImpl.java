@@ -10,7 +10,6 @@ import ru.skypro.diplom.dto.RegisterReq;
 import ru.skypro.diplom.enums.Role;
 import ru.skypro.diplom.repository.UserRepository;
 import ru.skypro.diplom.service.AuthService;
-import ru.skypro.diplom.service.UserService;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -32,11 +31,9 @@ public class AuthServiceImpl implements AuthService {
         if (!manager.userExists(userName)) {
             return false;
         }
-
         UserDetails userDetails = manager.loadUserByUsername(userName);
         String encryptedPassword = userDetails.getPassword();
         String encryptedPasswordWithoutEncryptionType = encryptedPassword.substring(8);
-
         return encoder.matches(password, encryptedPasswordWithoutEncryptionType);
     }
 
@@ -52,10 +49,11 @@ public class AuthServiceImpl implements AuthService {
                         .roles(role.name())
                         .build()
         );
+        UserDetails userDetails = manager.loadUserByUsername(registerReq.getUsername());
 
         ru.skypro.diplom.model.User user = new ru.skypro.diplom.model.User();
         user.setUsername(registerReq.getUsername());
-        user.setPassword(encoder.encode(registerReq.getPassword()));
+        user.setPassword(userDetails.getPassword());
         user.setEmail(registerReq.getUsername());
         user.setFirstName(registerReq.getFirstName());
         user.setLastName(registerReq.getLastName());

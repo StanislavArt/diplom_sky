@@ -17,9 +17,9 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping("users")
-//@CrossOrigin(value = "http://192.168.99.100:3000")
+@CrossOrigin(value = "http://192.168.99.100:3000")
 //@CrossOrigin(value = "http://192.168.0.152:3000")
-@CrossOrigin(value = "http://localhost:3000")
+//@CrossOrigin(value = "http://localhost:3000")
 public class UserController {
 
     private final UserService userService;
@@ -36,25 +36,31 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping(value = "/me")
+    @GetMapping("/me")
     public ResponseEntity<UserDTO> getUser(Authentication auth) {
         UserDTO userDTO = userService.getUser(auth);
         if (userDTO == null) { return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); }
         return ResponseEntity.ok(userDTO);
     }
 
-    @PatchMapping (value = "/me")
+    @PatchMapping ("/me")
     public ResponseEntity<UserDTO> updateUser(@RequestBody UserDTO userUpd, Authentication auth) {
         UserDTO userDTO = userService.updateUser(userUpd, auth);
         if (userDTO == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         return ResponseEntity.ok(userDTO);
     }
 
-    @PatchMapping (value = "/me/image", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    @PatchMapping (value = "/me/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> updateUserImage(@RequestPart(value = "image") MultipartFile file, Authentication auth) throws IOException {
         if (!userService.updateUserImage(file, auth)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{userId}/image")
+    public ResponseEntity<byte[]> getUser(@PathVariable int userId) {
+        byte[] image = userService.getUserImage(userId);
+        return ResponseEntity.ok(image);
     }
 }

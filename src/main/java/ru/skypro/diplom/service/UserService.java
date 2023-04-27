@@ -92,10 +92,7 @@ public class UserService {
         userDTO.setLastName(user.getLastName());
         userDTO.setEmail(user.getEmail());
         userDTO.setPhone(user.getPhone());
-
-        String imagePath = user.getImage() ==  null ? "" : user.getImage();
-        String image = transferFileToString(imagePath);
-        userDTO.setImage(image);
+        userDTO.setImage("/users/" + user.getId() + "/image");
         return userDTO;
     }
 
@@ -118,16 +115,24 @@ public class UserService {
         }
     }
 
-    public String transferFileToString(String fileName) {
-        if (fileName.isEmpty()) { return new String(); }
+    public byte[] transferFileToByteArray(String fileName) {
         try {
             byte[] array = Files.readAllBytes(Paths.get(storagePath + fileName));
-            return new String(array);
+            return array;
         } catch (IOException e) {
             logger.error("Error reading file in function 'transferFileToString()'");
             logger.error(Arrays.toString(e.getStackTrace()));
-            return new String();
+            return new byte[0];
         }
+    }
+
+    public byte[] getUserImage(int userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) { return new byte[0]; }
+        String fileName = user.getImage();
+        if (fileName == null || fileName.isEmpty()) { return new byte[0]; }
+        byte[] data = transferFileToByteArray(fileName);
+        return data;
     }
 
 }

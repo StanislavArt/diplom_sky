@@ -1,6 +1,7 @@
 package ru.skypro.diplom.controller;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -31,7 +32,7 @@ public class AdsController {
         return ResponseEntity.ok(adsService.getAllAds());
     }
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ResponseAds> addAds(@RequestPart(value = "properties") CreateAds createAds, @RequestPart(value = "image") MultipartFile file, Authentication auth) {
         ResponseAds ads = adsService.addAds(createAds, file, auth);
         if (ads == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -46,7 +47,7 @@ public class AdsController {
     @GetMapping("/{adPk}/comments")
     public ResponseEntity<ResponseWrapperComment> getComments(@PathVariable int adPk) {
         ResponseWrapperComment responseWrapperComment = commentService.getComments(adPk);
-        if (responseWrapperComment == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+       //if (responseWrapperComment == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         return ResponseEntity.ok(responseWrapperComment);
     }
 
@@ -77,12 +78,12 @@ public class AdsController {
         return ResponseEntity.ok(responseAds);
     }
 
-    @GetMapping("/{adPk}/comments/{id}")
-    public ResponseEntity<Comment> getComment(@PathVariable int id, @PathVariable int adPk) {
-        Comment comment = commentService.getComment(id, adPk);
-        if (comment == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        return ResponseEntity.ok(comment);
-    }
+//    @GetMapping("/{adPk}/comments/{id}")
+//    public ResponseEntity<Comment> getComment(@PathVariable int id, @PathVariable int adPk) {
+//        Comment comment = commentService.getComment(id, adPk);
+//        if (comment == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+//        return ResponseEntity.ok(comment);
+//    }
 
     @DeleteMapping("/{adPk}/comments/{id}")
     public ResponseEntity<Void> deleteComments(@PathVariable int id, @PathVariable int adPk) {
@@ -100,9 +101,15 @@ public class AdsController {
         return ResponseEntity.ok(comment);
     }
 
-    @PatchMapping("/{adPk}/image")
+    @PatchMapping(value = "/{adPk}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<List<String>> updateAdsImage(@PathVariable int adPk, @RequestPart(value = "image") MultipartFile file) {
         List<String> images = adsService.updateAdsImage(adPk, file);
         return ResponseEntity.ok(images);
+    }
+
+    @GetMapping(value = "/{adPk}/image")
+    public ResponseEntity<byte[]> getUser(@PathVariable int adPk) {
+        byte[] image = adsService.getAdsImage(adPk);
+        return ResponseEntity.ok(image);
     }
 }

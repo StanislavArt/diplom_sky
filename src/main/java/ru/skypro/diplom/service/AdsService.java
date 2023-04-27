@@ -28,9 +28,6 @@ public class AdsService {
     private final UserService userService;
     private final Logger logger = LoggerFactory.getLogger(AdsService.class);
 
-//    @Value("${diplom.storage}")
-//    private String storagePath;
-
     public AdsService(AdsRepository adsRepository, UserService userService) {
         this.adsRepository = adsRepository;
         this.userService = userService;
@@ -58,7 +55,6 @@ public class AdsService {
         ads.setPrice(createAds.getPrice());
         ads.setAuthor(user);
         ads.setImage(file.getOriginalFilename());
-
         Ads adsDB = adsRepository.save(ads);
         return createAdsDTO(adsDB);
     }
@@ -88,16 +84,9 @@ public class AdsService {
         if (!userService.writeFile(file)) { return images; }
         ads.setImage(file.getOriginalFilename());
         adsRepository.save(ads);
-        try {
-            images.add(new String(file.getBytes()));
-        } catch (IOException e) {
-            logger.error("Error InputStream in function 'updateAdsImage()'");
-            logger.error(Arrays.toString(e.getStackTrace()));
-        }
+        images.add("/ads/" + ads.getPk() + "/image");
         return images;
     }
-
-
 
     private ResponseWrapperAds getResponseWrapperAdsDTO(List<Ads> adsList) {
         ResponseWrapperAds responseWrapperAds = new ResponseWrapperAds();
@@ -121,8 +110,7 @@ public class AdsService {
         fullAds.setAuthorLastName(ads.getAuthor().getLastName());
         fullAds.setEmail(ads.getAuthor().getEmail());
         fullAds.setPhone(ads.getAuthor().getPhone());
-        //fullAds.setImage(userService.transferFileToString(ads.getImage()));
-        fullAds.setImage("");
+        fullAds.setImage("/ads/" + ads.getPk() + "/image");
         return fullAds;
     }
 
@@ -133,8 +121,7 @@ public class AdsService {
         responseAds.setTitle(ads.getTitle());
         responseAds.setAuthor(ads.getAuthor().getId());
         responseAds.setPrice(ads.getPrice());
-        //responseAds.setImage(userService.transferFileToString(ads.getImage()));
-        responseAds.setImage("");
+        responseAds.setImage("/ads/" + ads.getPk() + "/image");
         return responseAds;
     }
 
@@ -144,6 +131,13 @@ public class AdsService {
         ads.setPrice(createAds.getPrice());
     }
 
-
+    public byte[] getAdsImage(int adPk) {
+        Ads ads = adsRepository.findById(adPk).orElse(null);
+        if (ads == null) { return new byte[0]; }
+        String fileName = ads.getImage();
+        if (fileName == null || fileName.isEmpty()) { return new byte[0]; }
+        byte[] data = userService.transferFileToByteArray(fileName);
+        return data;
+    }
 
 }

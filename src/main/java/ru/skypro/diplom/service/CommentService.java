@@ -34,7 +34,8 @@ public class CommentService {
         if (ads == null) { return null; }
 
         List<Comment> comments = commentRepository.findAllByAds(ads);
-        if (comments.isEmpty()) { return null; }
+        //if (comments.isEmpty()) { return new ResponseWrapperComment(); }
+        //if (comments.isEmpty()) { return null; }
         return getResponseWrapperCommentDTO(comments);
     }
 
@@ -102,7 +103,7 @@ public class CommentService {
         if (comment == null) { return commentDTO; }
         commentDTO.setPk(comment.getPk());
         commentDTO.setAuthor(comment.getAuthor().getId());
-        commentDTO.setAuthorImage(comment.getAuthor().getImage());
+        commentDTO.setAuthorImage("/users/" + comment.getAuthor().getId() + "/image");
         commentDTO.setAuthorFirstName(comment.getAuthor().getFirstName());
         commentDTO.setCreatedAt(comment.getCreatedAt());
         commentDTO.setText(comment.getText());

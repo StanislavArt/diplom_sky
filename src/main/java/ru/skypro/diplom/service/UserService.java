@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -92,9 +93,15 @@ public class UserService {
     }
 
     public String prepareFileName(MultipartFile file) {
+        Set<String> allowedContent = Set.of("image/jpeg", "image/png");
+        if (!allowedContent.contains(file.getContentType())) {
+            logger.error("Тип содержимого не поддерживается (файл: {})", file.getOriginalFilename());
+            return null;
+        }
+
         int indexExtensionFile = file.getOriginalFilename().lastIndexOf(".");
         if (indexExtensionFile == -1) {
-            logger.warn("Не найдено расширение для выбранного файла {}", file.getOriginalFilename());
+            logger.error("Не найдено расширение для выбранного файла {}", file.getOriginalFilename());
             return null;
         }
         String extensionFile = file.getOriginalFilename().substring(indexExtensionFile);

@@ -71,7 +71,7 @@ public class PostgresUserDetails extends User {
         }
 
         public PostgresUserDetails.PostgresUserDetailsBuilder password(String password) {
-            this.password = encoder.encode(password);
+            this.password = "{bcrypt}" + encoder.encode(password);
             return this;
         }
 

@@ -34,9 +34,9 @@ public class AuthServiceImpl implements AuthService {
         }
         UserDetails userDetails = manager.loadUserByUsername(userName);
         String encryptedPassword = userDetails.getPassword();
-        //String encryptedPasswordWithoutEncryptionType = encryptedPassword.substring(8);
-        //return encoder.matches(password, encryptedPasswordWithoutEncryptionType);
-        return encoder.matches(password, encryptedPassword);
+        String encryptedPasswordWithoutEncryptionType = encryptedPassword.substring(8);
+        return encoder.matches(password, encryptedPasswordWithoutEncryptionType);
+        //return encoder.matches(password, encryptedPassword);
     }
 
     @Override

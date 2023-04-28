@@ -2,6 +2,7 @@ package ru.skypro.diplom.service;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.skypro.diplom.dto.CommentDTO;
 import ru.skypro.diplom.dto.ResponseWrapperComment;
 import ru.skypro.diplom.model.Ads;
@@ -49,6 +50,7 @@ public class CommentService {
         return getCommentDTO(comment);
     }
 
+    @Transactional
     public boolean deleteComments(int id, int adPk) {
         Ads ads = adsRepository.findById(adPk).orElse(null);
         if (ads == null) { return false; }
@@ -56,7 +58,7 @@ public class CommentService {
         Comment comment = commentRepository.findById(id).orElse(null);
         if (comment == null) { return false; }
 
-        commentRepository.deleteById(id);
+        commentRepository.deleteComment(id);
         return true;
     }
 

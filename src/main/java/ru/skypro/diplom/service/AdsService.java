@@ -2,9 +2,9 @@ package ru.skypro.diplom.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.diplom.dto.CreateAds;
 import ru.skypro.diplom.dto.FullAds;
@@ -13,6 +13,7 @@ import ru.skypro.diplom.dto.ResponseWrapperAds;
 import ru.skypro.diplom.model.Ads;
 import ru.skypro.diplom.model.User;
 import ru.skypro.diplom.repository.AdsRepository;
+import ru.skypro.diplom.repository.CommentRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,11 +21,13 @@ import java.util.List;
 @Service
 public class AdsService {
     private final AdsRepository adsRepository;
+    private final CommentRepository commentRepository;
     private final UserService userService;
     private final Logger logger = LoggerFactory.getLogger(AdsService.class);
 
-    public AdsService(AdsRepository adsRepository, UserService userService) {
+    public AdsService(AdsRepository adsRepository, CommentRepository commentRepository, UserService userService) {
         this.adsRepository = adsRepository;
+        this.commentRepository = commentRepository;
         this.userService = userService;
     }
 
@@ -72,8 +75,10 @@ public class AdsService {
         return createAdsDTO(ads);
     }
 
+    @Transactional
     public void removeAds(int id) {
-        adsRepository.deleteById(id);
+        commentRepository.deleteAllCommentsByAds(id);
+        adsRepository.deleteAds(id);
     }
 
     public List<String> updateAdsImage(int adPk, MultipartFile file) {

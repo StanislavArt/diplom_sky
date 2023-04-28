@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.diplom.dto.NewPassword;
 import ru.skypro.diplom.dto.UserDTO;
+import ru.skypro.diplom.enums.Role;
 import ru.skypro.diplom.model.User;
 import ru.skypro.diplom.repository.UserRepository;
 
@@ -141,6 +142,12 @@ public class UserService {
         String fileName = user.getImage();
         if (fileName == null || fileName.isEmpty()) { return new byte[0]; }
         return transferFileToByteArray(fileName);
+    }
+
+    public boolean operationForbidden(Authentication auth, String usernameOwner) {
+        if (auth.getAuthorities().contains(Role.ADMIN)) { return false; }
+        if (auth.getName() == usernameOwner) { return false; }
+        return true;
     }
 
 }

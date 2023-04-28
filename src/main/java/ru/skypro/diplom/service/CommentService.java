@@ -1,5 +1,6 @@
 package ru.skypro.diplom.service;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +28,7 @@ public class CommentService {
         this.userService = userService;
     }
 
+    @PreAuthorize("authentication.principal.username != 'user@gmail.com'")
     public ResponseWrapperComment getComments(int adsPk) {
         Ads ads = adsRepository.findById(adsPk).orElse(null);
         if (ads == null) { return null; }
@@ -34,6 +36,7 @@ public class CommentService {
         return getResponseWrapperCommentDTO(comments);
     }
 
+    @PreAuthorize("authentication.principal.username != 'user@gmail.com'")
     public CommentDTO addComment(CommentDTO commentDTO, int adPk, Authentication auth) {
         User user = userService.getUserFromAuthentication(auth);
         if (user == null) { return null; }
@@ -50,24 +53,28 @@ public class CommentService {
         return getCommentDTO(comment);
     }
 
+    @PreAuthorize("authentication.principal.username != 'user@gmail.com'")
     @Transactional
-    public boolean deleteComments(int id, int adPk) {
+    public boolean deleteComments(int id, int adPk, Authentication auth) {
         Ads ads = adsRepository.findById(adPk).orElse(null);
         if (ads == null) { return false; }
 
         Comment comment = commentRepository.findById(id).orElse(null);
         if (comment == null) { return false; }
+        if (userService.operationForbidden(auth, comment.getAuthor().getUsername())) { return false; }
 
         commentRepository.deleteComment(id);
         return true;
     }
 
-    public CommentDTO updateComments(int id, int adPk, CommentDTO commentDTO) {
+    @PreAuthorize("authentication.principal.username != 'user@gmail.com'")
+    public CommentDTO updateComments(int id, int adPk, CommentDTO commentDTO, Authentication auth) {
         Ads ads = adsRepository.findById(adPk).orElse(null);
         if (ads == null) { return null; }
 
         Comment comment = commentRepository.findById(id).orElse(null);
         if (comment == null) { return null; }
+        if (userService.operationForbidden(auth, comment.getAuthor().getUsername())) { return null; }
 
         comment.setText(commentDTO.getText());
         comment.setCreatedAt(System.currentTimeMillis());

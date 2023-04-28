@@ -64,21 +64,21 @@ public class AdsController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> removeAds(@PathVariable int id) {
-        adsService.removeAds(id);
+    public ResponseEntity<Void> removeAds(@PathVariable int id, Authentication auth) {
+        adsService.removeAds(id, auth);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<ResponseAds> updateAds(@PathVariable int id, @RequestBody CreateAds createAds) {
-        ResponseAds responseAds = adsService.updateAds(id, createAds);
+    public ResponseEntity<ResponseAds> updateAds(@PathVariable int id, @RequestBody CreateAds createAds, Authentication auth) {
+        ResponseAds responseAds = adsService.updateAds(id, createAds, auth);
         if (responseAds == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         return ResponseEntity.ok(responseAds);
     }
 
     @DeleteMapping("/{adPk}/comments/{id}")
-    public ResponseEntity<Void> deleteComments(@PathVariable int id, @PathVariable int adPk) {
-        if (!commentService.deleteComments(id, adPk)) {
+    public ResponseEntity<Void> deleteComments(@PathVariable int id, @PathVariable int adPk, Authentication auth) {
+        if (!commentService.deleteComments(id, adPk, auth)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } else {
             return ResponseEntity.ok().build();
@@ -86,8 +86,8 @@ public class AdsController {
     }
 
     @PatchMapping("/{adPk}/comments/{id}")
-    public ResponseEntity<CommentDTO> updateComments(@PathVariable int id, @PathVariable int adPk, @RequestBody CommentDTO commentDTO) {
-        CommentDTO comment = commentService.updateComments(id, adPk, commentDTO);
+    public ResponseEntity<CommentDTO> updateComments(@PathVariable int id, @PathVariable int adPk, @RequestBody CommentDTO commentDTO, Authentication auth) {
+        CommentDTO comment = commentService.updateComments(id, adPk, commentDTO, auth);
         if (comment == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         return ResponseEntity.ok(comment);
     }

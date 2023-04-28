@@ -2,6 +2,7 @@ package ru.skypro.diplom.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,6 +44,7 @@ public class AdsService {
         return getResponseWrapperAdsDTO(adsList);
     }
 
+    @PreAuthorize("authentication.principal.username != 'user@gmail.com'")
     public ResponseAds addAds(CreateAds createAds, MultipartFile file, Authentication auth) {
         User user = userService.getUserFromAuthentication(auth);
         if (user == null) { return null; }
@@ -61,26 +63,34 @@ public class AdsService {
         return createAdsDTO(adsDB);
     }
 
+    @PreAuthorize("authentication.principal.username != 'user@gmail.com'")
     public FullAds getFullAd(int id) {
         Ads ads = adsRepository.findById(id).orElse(null);
         if (ads == null) { return null; }
         return getFullAdsDTO(ads);
     }
 
-    public ResponseAds updateAds(int id, CreateAds createAds) {
+    @PreAuthorize("authentication.principal.username != 'user@gmail.com'")
+    public ResponseAds updateAds(int id, CreateAds createAds, Authentication auth) {
         Ads ads = adsRepository.findById(id).orElse(null);
         if (ads == null) { return null; }
+        if (userService.operationForbidden(auth, ads.getAuthor().getUsername())) { return null; }
         updateAdsDTO(ads, createAds);
         ads = adsRepository.save(ads);
         return createAdsDTO(ads);
     }
 
+    @PreAuthorize("authentication.principal.username != 'user@gmail.com'")
     @Transactional
-    public void removeAds(int id) {
+    public void removeAds(int id, Authentication auth) {
+        Ads ads = adsRepository.findById(id).orElse(null);
+        if (ads == null) { return; }
+        if (userService.operationForbidden(auth, ads.getAuthor().getUsername())) { return; }
         commentRepository.deleteAllCommentsByAds(id);
         adsRepository.deleteAds(id);
     }
 
+    @PreAuthorize("authentication.principal.username != 'user@gmail.com'")
     public List<String> updateAdsImage(int adPk, MultipartFile file) {
         List<String> images = new ArrayList<>();
         Ads ads = adsRepository.findById(adPk).orElse(null);

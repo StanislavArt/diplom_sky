@@ -1,23 +1,21 @@
 package ru.skypro.diplom;
 
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
-import org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.*;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import ru.skypro.diplom.repository.UserRepository;
+import ru.skypro.diplom.service.PostgresUserDetails;
+import ru.skypro.diplom.service.PostgresUserDetailsManager;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
-//@EnableWebSecurity
 public class WebSecurityConfig {
+
+    private final UserRepository userRepository;
 
     private static final String[] AUTH_WHITELIST = {
             "/swagger-resources/**",
@@ -27,14 +25,31 @@ public class WebSecurityConfig {
             "/login", "/register"
     };
 
+    public WebSecurityConfig(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+
+//    @Bean
+//    public InMemoryUserDetailsManager userDetailsService() {
+//        UserDetails user = User.withDefaultPasswordEncoder()
+//                .username("user@gmail.com")
+//                .password("password")
+//                .roles("USER")
+//                .build();
+//        return new InMemoryUserDetailsManager(user);
+//    }
+
     @Bean
-    public InMemoryUserDetailsManager userDetailsService() {
-        UserDetails user = User.withDefaultPasswordEncoder()
+    public PostgresUserDetailsManager userDetailsService() {
+        UserDetails user = PostgresUserDetails.builderPostgres()
                 .username("user@gmail.com")
                 .password("password")
-                .roles("USER")
+                .role("USER")
                 .build();
-        return new InMemoryUserDetailsManager(user);
+        PostgresUserDetailsManager manager = new PostgresUserDetailsManager(userRepository);
+        manager.createUser(user);
+        return manager;
     }
 
     @Bean

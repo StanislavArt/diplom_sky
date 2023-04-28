@@ -39,6 +39,10 @@ public class PostgresUserDetails extends User {
         this.id = 0;
     }
 
+    public static PostgresUserDetails.PostgresUserDetailsBuilder builderPostgres() {
+        return new PostgresUserDetails.PostgresUserDetailsBuilder();
+    }
+
     public static final class PostgresUserDetailsBuilder {
         private String firstName;
         private String lastName;

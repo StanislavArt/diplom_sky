@@ -75,21 +75,30 @@ public class UserService {
         User user = getUserFromAuthentication(auth);
         if (user == null) { return false; }
 
-        String encryptedPassword = user.getPassword();
-        String encryptionType = encryptedPassword.substring(0, 8);
-        String encryptedPasswordWithoutEncryptionType = encryptedPassword.substring(8);
-        if (!encoder.matches(newPassword.getCurrentPassword(), encryptedPasswordWithoutEncryptionType)) {
+        try {
+            manager.changePassword(newPassword.getCurrentPassword(), newPassword.getNewPassword());
+        } catch (Exception e) {
+            logger.error("Ошибка при изменении пароля");
+            logger.error(e.getStackTrace().toString());
             return false;
-        };
-        if (encoder.matches(newPassword.getNewPassword(), encryptedPasswordWithoutEncryptionType)) {
-            return false;
-        };
-
-        String encryptedNewPassword = encryptionType + encoder.encode(newPassword.getNewPassword());
-        manager.changePassword(encryptedPassword, encryptedNewPassword);
-        user.setPassword(encryptedNewPassword);
-        user = userRepository.save(user);
+        }
         return true;
+
+//        String encryptedPassword = user.getPassword();
+//        String encryptionType = encryptedPassword.substring(0, 8);
+//        String encryptedPasswordWithoutEncryptionType = encryptedPassword.substring(8);
+//        if (!encoder.matches(newPassword.getCurrentPassword(), encryptedPasswordWithoutEncryptionType)) {
+//            return false;
+//        };
+//        if (encoder.matches(newPassword.getNewPassword(), encryptedPasswordWithoutEncryptionType)) {
+//            return false;
+//        };
+//
+//        String encryptedNewPassword = encryptionType + encoder.encode(newPassword.getNewPassword());
+//        manager.changePassword(encryptedPassword, encryptedNewPassword);
+//        user.setPassword(encryptedNewPassword);
+//        user = userRepository.save(user);
+//        return true;
     }
 
     public String prepareFileName(MultipartFile file) {

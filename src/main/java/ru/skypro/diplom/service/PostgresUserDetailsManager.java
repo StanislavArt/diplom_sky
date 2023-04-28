@@ -76,7 +76,12 @@ public class PostgresUserDetailsManager implements UserDetailsManager {
             logger.error("Ошибка: переданный в функцию пользователь равен null");
             return;
         }
+
         User userBD = ((PostgresUserDetails) user).getUser();
+        if (userExists(userBD.getUsername()) && userBD.getId() == 0) {
+            logger.warn("Пользователь с ником '{}' уже существует в базе", userBD.getUsername());
+            return;
+        }
         userRepository.save(userBD);
     }
 }

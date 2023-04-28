@@ -10,6 +10,7 @@ import ru.skypro.diplom.dto.RegisterReq;
 import ru.skypro.diplom.enums.Role;
 import ru.skypro.diplom.repository.UserRepository;
 import ru.skypro.diplom.service.AuthService;
+import ru.skypro.diplom.service.PostgresUserDetails;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -33,8 +34,9 @@ public class AuthServiceImpl implements AuthService {
         }
         UserDetails userDetails = manager.loadUserByUsername(userName);
         String encryptedPassword = userDetails.getPassword();
-        String encryptedPasswordWithoutEncryptionType = encryptedPassword.substring(8);
-        return encoder.matches(password, encryptedPasswordWithoutEncryptionType);
+        //String encryptedPasswordWithoutEncryptionType = encryptedPassword.substring(8);
+        //return encoder.matches(password, encryptedPasswordWithoutEncryptionType);
+        return encoder.matches(password, encryptedPassword);
     }
 
     @Override
@@ -43,23 +45,31 @@ public class AuthServiceImpl implements AuthService {
             return false;
         }
         manager.createUser(
-                User.withDefaultPasswordEncoder()
-                        .password(registerReq.getPassword())
-                        .username(registerReq.getUsername())
-                        .roles(role.name())
-                        .build()
+//                User.withDefaultPasswordEncoder()
+//                        .password(registerReq.getPassword())
+//                        .username(registerReq.getUsername())
+//                        .roles(role.name())
+//                        .build()
+                PostgresUserDetails.builderPostgres()
+                    .username(registerReq.getUsername())
+                    .password(registerReq.getPassword())
+                    .role(role.name())
+                    .firstName(registerReq.getFirstName())
+                    .lastName(registerReq.getLastName())
+                    .phone(registerReq.getPhone())
+                    .build()
         );
-        UserDetails userDetails = manager.loadUserByUsername(registerReq.getUsername());
-
-        ru.skypro.diplom.model.User user = new ru.skypro.diplom.model.User();
-        user.setUsername(registerReq.getUsername());
-        user.setPassword(userDetails.getPassword());
-        user.setEmail(registerReq.getUsername());
-        user.setFirstName(registerReq.getFirstName());
-        user.setLastName(registerReq.getLastName());
-        user.setPhone(registerReq.getPhone());
-        user.setRole(role);
-        userRepository.save(user);
+//        UserDetails userDetails = manager.loadUserByUsername(registerReq.getUsername());
+//
+//        ru.skypro.diplom.model.User user = new ru.skypro.diplom.model.User();
+//        user.setUsername(registerReq.getUsername());
+//        user.setPassword(userDetails.getPassword());
+//        user.setEmail(registerReq.getUsername());
+//        user.setFirstName(registerReq.getFirstName());
+//        user.setLastName(registerReq.getLastName());
+//        user.setPhone(registerReq.getPhone());
+//        user.setRole(role);
+//        userRepository.save(user);
 
         return true;
     }

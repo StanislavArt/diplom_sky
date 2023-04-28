@@ -48,7 +48,11 @@ public class AdsService {
     public ResponseAds addAds(CreateAds createAds, MultipartFile file, Authentication auth) {
         User user = userService.getUserFromAuthentication(auth);
         if (user == null) { return null; }
-        if (!userService.writeFile(file)) { return null; }
+
+        String fileName = userService.prepareFileName(file);
+        if (fileName == null) { return null; }
+
+        if (!userService.writeFile(file, fileName)) { return null; }
         Ads ads = new Ads();
         ads.setTitle(createAds.getTitle());
         ads.setDescription(createAds.getDescription());
@@ -81,7 +85,11 @@ public class AdsService {
         List<String> images = new ArrayList<>();
         Ads ads = adsRepository.findById(adPk).orElse(null);
         if (ads == null) { return images; }
-        if (!userService.writeFile(file)) { return images; }
+
+        String fileName = userService.prepareFileName(file);
+        if (fileName == null) { return images; }
+
+        if (!userService.writeFile(file, fileName)) { return images; }
         ads.setImage(file.getOriginalFilename());
         adsRepository.save(ads);
         images.add("/ads/" + ads.getPk() + "/image");

@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -57,7 +58,13 @@ public class UserService {
     public boolean updateUserImage(MultipartFile file, Authentication auth) {
         User user = getUserFromAuthentication(auth);
         if (user == null) { return false; }
-        if (!writeFile(file)) { return false; }
+
+        logger.warn("Тип содержимоего файла: " + file.getContentType());
+
+        String fileName = prepareFileName(file);
+        if (fileName == null) { return false; }
+
+        if (!writeFile(file, fileName)) { return false; }
         user.setImage(file.getOriginalFilename());
         user = userRepository.save(user);
         return true;
@@ -84,6 +91,17 @@ public class UserService {
         return true;
     }
 
+    public String prepareFileName(MultipartFile file) {
+        int indexExtensionFile = file.getOriginalFilename().lastIndexOf(".");
+        if (indexExtensionFile == -1) {
+            logger.warn("Не найдено расширение для выбранного файла {}", file.getOriginalFilename());
+            return null;
+        }
+        String extensionFile = file.getOriginalFilename().substring(indexExtensionFile);
+        String fileName = UUID.randomUUID().toString() + extensionFile;
+        return fileName;
+    }
+
     private UserDTO getUserDTO(User user) {
         if (user == null ) { return null; }
         UserDTO userDTO = new UserDTO();
@@ -102,9 +120,8 @@ public class UserService {
         return user;
     }
 
-    public boolean writeFile(MultipartFile file) {
+    public boolean writeFile(MultipartFile file, String fileName) {
         try {
-            String fileName = file.getOriginalFilename();
             File pathFile = new File(storagePath + fileName);
             file.transferTo(pathFile);
             return true;

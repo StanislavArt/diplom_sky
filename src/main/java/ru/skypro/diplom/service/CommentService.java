@@ -1,7 +1,5 @@
 package ru.skypro.diplom.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import ru.skypro.diplom.dto.CommentDTO;
@@ -21,7 +19,6 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final AdsRepository adsRepository;
     private final UserService userService;
-    private final Logger logger = LoggerFactory.getLogger(CommentService.class);
 
     public CommentService(CommentRepository commentRepository, UserService userService, AdsRepository adsRepository) {
         this.commentRepository = commentRepository;
@@ -32,10 +29,7 @@ public class CommentService {
     public ResponseWrapperComment getComments(int adsPk) {
         Ads ads = adsRepository.findById(adsPk).orElse(null);
         if (ads == null) { return null; }
-
         List<Comment> comments = commentRepository.findAllByAds(ads);
-        //if (comments.isEmpty()) { return new ResponseWrapperComment(); }
-        //if (comments.isEmpty()) { return null; }
         return getResponseWrapperCommentDTO(comments);
     }
 
@@ -53,13 +47,6 @@ public class CommentService {
         comment.setText(commentDTO.getText());
         comment = commentRepository.save(comment);
         return getCommentDTO(comment);
-    }
-
-    public Comment getComment(int id, int adPk) {
-        Ads ads = adsRepository.findById(adPk).orElse(null);
-        if (ads == null) { return null; }
-        Comment comment = commentRepository.findById(id).orElse(null);
-        return comment;
     }
 
     public boolean deleteComments(int id, int adPk) {

@@ -14,12 +14,7 @@ import ru.skypro.diplom.model.Ads;
 import ru.skypro.diplom.model.User;
 import ru.skypro.diplom.repository.AdsRepository;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -58,7 +53,7 @@ public class AdsService {
         ads.setDescription(createAds.getDescription());
         ads.setPrice(createAds.getPrice());
         ads.setAuthor(user);
-        ads.setImage(file.getOriginalFilename());
+        ads.setImage(fileName);
         Ads adsDB = adsRepository.save(ads);
         return createAdsDTO(adsDB);
     }
@@ -90,7 +85,7 @@ public class AdsService {
         if (fileName == null) { return images; }
 
         if (!userService.writeFile(file, fileName)) { return images; }
-        ads.setImage(file.getOriginalFilename());
+        ads.setImage(fileName);
         adsRepository.save(ads);
         images.add("/ads/" + ads.getPk() + "/image");
         return images;

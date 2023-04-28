@@ -1,25 +1,19 @@
 package ru.skypro.diplom.controller;
 
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.diplom.dto.*;
-import ru.skypro.diplom.model.User;
 import ru.skypro.diplom.service.UserService;
-
-import javax.annotation.security.RolesAllowed;
-import java.io.IOException;
 
 @RestController
 @RequestMapping("users")
-//@CrossOrigin(value = "http://192.168.99.100:3000")
+@CrossOrigin(value = "http://192.168.99.100:3000")
 //@CrossOrigin(value = "http://192.168.0.152:3000")
-@CrossOrigin(value = "http://localhost:3000")
+//@CrossOrigin(value = "http://localhost:3000")
 public class UserController {
 
     private final UserService userService;
@@ -51,7 +45,7 @@ public class UserController {
     }
 
     @PatchMapping (value = "/me/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Void> updateUserImage(@RequestPart(value = "image") MultipartFile file, Authentication auth) throws IOException {
+    public ResponseEntity<Void> updateUserImage(@RequestPart(value = "image") MultipartFile file, Authentication auth) {
         if (!userService.updateUserImage(file, auth)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }

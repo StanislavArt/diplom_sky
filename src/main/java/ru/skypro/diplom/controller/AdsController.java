@@ -7,7 +7,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.diplom.dto.*;
-import ru.skypro.diplom.model.Comment;
 import ru.skypro.diplom.service.AdsService;
 import ru.skypro.diplom.service.CommentService;
 
@@ -15,9 +14,9 @@ import java.util.List;
 
 @RestController
 @RequestMapping("ads")
-//@CrossOrigin(value = "http://192.168.99.100:3000")
+@CrossOrigin(value = "http://192.168.99.100:3000")
 //@CrossOrigin(value = "http://192.168.0.152:3000")
-@CrossOrigin(value = "http://localhost:3000")
+//@CrossOrigin(value = "http://localhost:3000")
 public class AdsController {
     private final AdsService adsService;
     private final CommentService commentService;
@@ -47,7 +46,6 @@ public class AdsController {
     @GetMapping("/{adPk}/comments")
     public ResponseEntity<ResponseWrapperComment> getComments(@PathVariable int adPk) {
         ResponseWrapperComment responseWrapperComment = commentService.getComments(adPk);
-       //if (responseWrapperComment == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         return ResponseEntity.ok(responseWrapperComment);
     }
 
@@ -77,13 +75,6 @@ public class AdsController {
         if (responseAds == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         return ResponseEntity.ok(responseAds);
     }
-
-//    @GetMapping("/{adPk}/comments/{id}")
-//    public ResponseEntity<Comment> getComment(@PathVariable int id, @PathVariable int adPk) {
-//        Comment comment = commentService.getComment(id, adPk);
-//        if (comment == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-//        return ResponseEntity.ok(comment);
-//    }
 
     @DeleteMapping("/{adPk}/comments/{id}")
     public ResponseEntity<Void> deleteComments(@PathVariable int id, @PathVariable int adPk) {

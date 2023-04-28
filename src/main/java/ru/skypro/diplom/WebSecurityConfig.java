@@ -1,10 +1,8 @@
 package ru.skypro.diplom;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.*;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import ru.skypro.diplom.repository.UserRepository;
 import ru.skypro.diplom.service.PostgresUserDetails;
@@ -29,26 +27,14 @@ public class WebSecurityConfig {
         this.userRepository = userRepository;
     }
 
-
-//    @Bean
-//    public InMemoryUserDetailsManager userDetailsService() {
-//        UserDetails user = User.withDefaultPasswordEncoder()
-//                .username("user@gmail.com")
-//                .password("password")
-//                .roles("USER")
-//                .build();
-//        return new InMemoryUserDetailsManager(user);
-//    }
-
     @Bean
     public PostgresUserDetailsManager userDetailsService() {
-        UserDetails user = PostgresUserDetails.builderPostgres()
+        PostgresUserDetailsManager manager = new PostgresUserDetailsManager(userRepository);
+        manager.createUser(PostgresUserDetails.builderPostgres()
                 .username("user@gmail.com")
                 .password("password")
                 .role("USER")
-                .build();
-        PostgresUserDetailsManager manager = new PostgresUserDetailsManager(userRepository);
-        manager.createUser(user);
+                .build());
         return manager;
     }
 

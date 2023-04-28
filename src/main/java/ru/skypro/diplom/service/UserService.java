@@ -3,11 +3,8 @@ package ru.skypro.diplom.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,6 +18,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -29,7 +27,6 @@ public class UserService {
     private final UserRepository userRepository;
     private final Logger logger = LoggerFactory.getLogger(UserService.class);
     private final UserDetailsManager manager;
-    private final PasswordEncoder encoder;
 
     @Value("${diplom.storage}")
     private String storagePath;
@@ -37,7 +34,6 @@ public class UserService {
     public UserService(UserRepository userRepository, UserDetailsManager manager) {
         this.userRepository = userRepository;
         this.manager = manager;
-        this.encoder = new BCryptPasswordEncoder();
     }
 
     public UserDTO getUser(Authentication auth) {
@@ -66,7 +62,7 @@ public class UserService {
         if (fileName == null) { return false; }
 
         if (!writeFile(file, fileName)) { return false; }
-        user.setImage(file.getOriginalFilename());
+        user.setImage(fileName);
         user = userRepository.save(user);
         return true;
     }
@@ -79,26 +75,10 @@ public class UserService {
             manager.changePassword(newPassword.getCurrentPassword(), newPassword.getNewPassword());
         } catch (Exception e) {
             logger.error("Ошибка при изменении пароля");
-            logger.error(e.getStackTrace().toString());
+            logger.error(Arrays.toString(e.getStackTrace()));
             return false;
         }
         return true;
-
-//        String encryptedPassword = user.getPassword();
-//        String encryptionType = encryptedPassword.substring(0, 8);
-//        String encryptedPasswordWithoutEncryptionType = encryptedPassword.substring(8);
-//        if (!encoder.matches(newPassword.getCurrentPassword(), encryptedPasswordWithoutEncryptionType)) {
-//            return false;
-//        };
-//        if (encoder.matches(newPassword.getNewPassword(), encryptedPasswordWithoutEncryptionType)) {
-//            return false;
-//        };
-//
-//        String encryptedNewPassword = encryptionType + encoder.encode(newPassword.getNewPassword());
-//        manager.changePassword(encryptedPassword, encryptedNewPassword);
-//        user.setPassword(encryptedNewPassword);
-//        user = userRepository.save(user);
-//        return true;
     }
 
     public String prepareFileName(MultipartFile file) {
@@ -108,14 +88,13 @@ public class UserService {
             return null;
         }
 
-        int indexExtensionFile = file.getOriginalFilename().lastIndexOf(".");
+        int indexExtensionFile = Objects.requireNonNull(file.getOriginalFilename()).lastIndexOf(".");
         if (indexExtensionFile == -1) {
             logger.error("Не найдено расширение для выбранного файла {}", file.getOriginalFilename());
             return null;
         }
         String extensionFile = file.getOriginalFilename().substring(indexExtensionFile);
-        String fileName = UUID.randomUUID().toString() + extensionFile;
-        return fileName;
+        return UUID.randomUUID().toString() + extensionFile;
     }
 
     private UserDTO getUserDTO(User user) {
@@ -132,8 +111,7 @@ public class UserService {
 
     public User getUserFromAuthentication(Authentication authentication) {
         String username = ((UserDetails) authentication.getPrincipal()).getUsername();
-        User user = userRepository.findUserByUsername(username).orElse(null);
-        return user;
+        return userRepository.findUserByUsername(username).orElse(null);
     }
 
     public boolean writeFile(MultipartFile file, String fileName) {
@@ -150,8 +128,7 @@ public class UserService {
 
     public byte[] transferFileToByteArray(String fileName) {
         try {
-            byte[] array = Files.readAllBytes(Paths.get(storagePath + fileName));
-            return array;
+            return Files.readAllBytes(Paths.get(storagePath + fileName));
         } catch (IOException e) {
             logger.error("Error reading file in function 'transferFileToString()'");
             logger.error(Arrays.toString(e.getStackTrace()));
@@ -164,8 +141,7 @@ public class UserService {
         if (user == null) { return new byte[0]; }
         String fileName = user.getImage();
         if (fileName == null || fileName.isEmpty()) { return new byte[0]; }
-        byte[] data = transferFileToByteArray(fileName);
-        return data;
+        return transferFileToByteArray(fileName);
     }
 
 }

@@ -56,8 +56,6 @@ public class UserService {
         User user = getUserFromAuthentication(auth);
         if (user == null) { return false; }
 
-        logger.warn("Тип содержимоего файла: " + file.getContentType());
-
         String fileName = prepareFileName(file);
         if (fileName == null) { return false; }
 

@@ -50,9 +50,9 @@ public class PostgresUserDetailsManager implements UserDetailsManager {
             logger.error("Пользователь '{}' не найден в базе данных", username);
             return;
         }
-        String encryptedOldPassword = "{bcrypt}" + encoder.encode(oldPassword);
-        if (!encryptedOldPassword.equals(userBD.getPassword())) {
-            logger.error("Пользователь неверно указал старый пароль");
+        String encryptedPasswordWithoutEncryptionType = userBD.getPassword().substring(8);
+        if (!encoder.matches(oldPassword, encryptedPasswordWithoutEncryptionType)) {
+            logger.error("Пользователь c ником '{}' неверно указал старый пароль", username);
             return;
         }
         userBD.setPassword("{bcrypt}" + encoder.encode(newPassword));

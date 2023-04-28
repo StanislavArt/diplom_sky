@@ -30,10 +30,18 @@ public class WebSecurityConfig {
     @Bean
     public PostgresUserDetailsManager userDetailsService() {
         PostgresUserDetailsManager manager = new PostgresUserDetailsManager(userRepository);
+
         manager.createUser(PostgresUserDetails.builderPostgres()
                 .username("user@gmail.com")
                 .password("password")
                 .role("USER")
+                .build());
+
+        manager.createUser(PostgresUserDetails.builderPostgres()
+                .username("admin@gmail.com")
+                .password("admin")
+                .role("ADMIN")
+                .firstName("Николя")
                 .build());
         return manager;
     }

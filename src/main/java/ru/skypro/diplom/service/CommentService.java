@@ -74,7 +74,9 @@ public class CommentService {
 
         Comment comment = commentRepository.findById(id).orElse(null);
         if (comment == null) { return null; }
-        if (userService.operationForbidden(auth, comment.getAuthor().getUsername())) { return null; }
+        if (userService.operationForbidden(auth, comment.getAuthor().getUsername())) {
+            return null;
+        }
 
         comment.setText(commentDTO.getText());
         comment.setCreatedAt(System.currentTimeMillis());

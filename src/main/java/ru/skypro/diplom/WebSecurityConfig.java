@@ -4,7 +4,6 @@ import org.springframework.context.annotation.*;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import ru.skypro.diplom.service.PostgresUserDetails;
 import ru.skypro.diplom.service.PostgresUserDetailsManager;
 
 import static org.springframework.security.config.Customizer.withDefaults;
@@ -22,21 +21,7 @@ public class WebSecurityConfig {
 
     @Bean
     public PostgresUserDetailsManager userDetailsService() {
-        PostgresUserDetailsManager manager = PostgresUserDetailsManager.build(new BCryptPasswordEncoder());
-
-//        manager.createUser(PostgresUserDetails.builderPostgres()
-//                .username("user@gmail.com")
-//                .password("password")
-//                .role("USER")
-//                .build());
-//
-//        manager.createUser(PostgresUserDetails.builderPostgres()
-//                .username("admin@gmail.com")
-//                .password("admin")
-//                .role("ADMIN")
-//                .firstName("Николя")
-//                .build());
-        return manager;
+        return PostgresUserDetailsManager.build(new BCryptPasswordEncoder());
     }
 
     @Bean

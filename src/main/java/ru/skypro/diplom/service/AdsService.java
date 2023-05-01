@@ -86,6 +86,7 @@ public class AdsService {
         Ads ads = adsRepository.findById(id).orElse(null);
         if (ads == null) { return; }
         if (userService.operationForbidden(auth, ads.getAuthor().getUsername())) { return; }
+        if (!userService.deleteImageFile(ads.getImage())) { return; }
         commentRepository.deleteAllCommentsByAds(id);
         adsRepository.deleteAds(id);
     }
@@ -99,6 +100,9 @@ public class AdsService {
         String fileName = userService.prepareFileName(file);
         if (fileName == null) { return images; }
 
+        if (!userService.deleteImageFile(ads.getImage())) {
+            return images;
+        }
         if (!userService.writeFile(file, fileName)) { return images; }
         ads.setImage(fileName);
         adsRepository.save(ads);

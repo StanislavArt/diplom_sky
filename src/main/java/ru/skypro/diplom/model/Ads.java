@@ -20,8 +20,7 @@ public class Ads {
 
     private int price;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "ads", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Image> images;
+    private String image;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "ads", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Comment> comments;
@@ -65,13 +64,12 @@ public class Ads {
     public void setPrice(int price) {
         this.price = price;
     }
-
-    public Set<Image> getImages() {
-        return images;
+    public String getImage() {
+        return image;
     }
 
-    public void setImages(Set<Image> images) {
-        this.images = images;
+    public void setImage(String image) {
+        this.image = image;
     }
 
     public Set<Comment> getComments() {

@@ -6,7 +6,7 @@ import java.util.List;
 
 public class ResponseWrapperComment {
     private int count;
-    private List<Comment> results;
+    private List<CommentDTO> results;
 
     public ResponseWrapperComment() {}
 
@@ -18,11 +18,11 @@ public class ResponseWrapperComment {
         this.count = count;
     }
 
-    public List<Comment> getResults() {
+    public List<CommentDTO> getResults() {
         return results;
     }
 
-    public void setResults(List<Comment> results) {
+    public void setResults(List<CommentDTO> results) {
         this.results = results;
     }
 }

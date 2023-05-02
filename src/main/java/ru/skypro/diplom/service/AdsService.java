@@ -2,33 +2,34 @@ package ru.skypro.diplom.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
-import org.springframework.web.context.annotation.SessionScope;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.diplom.dto.CreateAds;
 import ru.skypro.diplom.dto.FullAds;
+import ru.skypro.diplom.dto.ResponseAds;
 import ru.skypro.diplom.dto.ResponseWrapperAds;
 import ru.skypro.diplom.model.Ads;
-import ru.skypro.diplom.model.Image;
 import ru.skypro.diplom.model.User;
 import ru.skypro.diplom.repository.AdsRepository;
-import ru.skypro.diplom.repository.ImageRepository;
+import ru.skypro.diplom.repository.CommentRepository;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Service
-@SessionScope
 public class AdsService {
     private final AdsRepository adsRepository;
+    private final CommentRepository commentRepository;
     private final UserService userService;
-    private final ImageRepository imageRepository;
     private final Logger logger = LoggerFactory.getLogger(AdsService.class);
 
-    public AdsService(AdsRepository adsRepository, UserService userService, ImageRepository imageRepository) {
+    public AdsService(AdsRepository adsRepository, CommentRepository commentRepository, UserService userService) {
         this.adsRepository = adsRepository;
+        this.commentRepository = commentRepository;
         this.userService = userService;
-        this.imageRepository = imageRepository;
     }
 
     public ResponseWrapperAds getAllAds() {
@@ -36,66 +37,88 @@ public class AdsService {
         return getResponseWrapperAdsDTO(adsList);
     }
 
-    public ResponseWrapperAds getAds() {
-        User user = userService.getCurrentUser();
-        if (user == null) return null;
-        List<Ads> adsList = adsRepository.findAllByAuthor(userService.getCurrentUser());
+    public ResponseWrapperAds getAds(Authentication auth) {
+        User user = userService.getUserFromAuthentication(auth);
+        if (user == null) { return null; }
+        List<Ads> adsList = adsRepository.findAllByAuthor(user);
         return getResponseWrapperAdsDTO(adsList);
     }
 
-    public Ads addAds(CreateAds createAds, byte[] image) {
-        User user = userService.getCurrentUser();
-        if (user == null) return null;
-        Ads ads = createAdsDTO(createAds);
+    @PreAuthorize("authentication.principal.username != 'user@gmail.com'")
+    public ResponseAds addAds(CreateAds createAds, MultipartFile file, Authentication auth) {
+        User user = userService.getUserFromAuthentication(auth);
+        if (user == null) { return null; }
 
-        Set<Image> images = new HashSet<>();
-        images.add(new Image(new String(image)));
-        ads.setImages(images);
+        String fileName = userService.prepareFileName(file);
+        if (fileName == null) { return null; }
 
+        if (!userService.writeFile(file, fileName)) { return null; }
+        Ads ads = new Ads();
+        ads.setTitle(createAds.getTitle());
+        ads.setDescription(createAds.getDescription());
+        ads.setPrice(createAds.getPrice());
+        ads.setAuthor(user);
+        ads.setImage(fileName);
         Ads adsDB = adsRepository.save(ads);
-        if (adsDB == null) logger.error("Write error into database (function 'addAds()'");
-        return adsDB;
+        return createAdsDTO(adsDB);
     }
 
+    @PreAuthorize("authentication.principal.username != 'user@gmail.com'")
     public FullAds getFullAd(int id) {
-        // проверка на авторизацию
-        // ...
-
         Ads ads = adsRepository.findById(id).orElse(null);
-        if (ads == null) return null;
+        if (ads == null) { return null; }
         return getFullAdsDTO(ads);
     }
 
-    public Ads updateAds(int id, CreateAds createAds) {
-        // проверка на авторизацию
-        // ...
-
+    @PreAuthorize("authentication.principal.username != 'user@gmail.com'")
+    public ResponseAds updateAds(int id, CreateAds createAds, Authentication auth) {
         Ads ads = adsRepository.findById(id).orElse(null);
-        if (ads == null) return null;
+        if (ads == null) { return null; }
+        if (userService.operationForbidden(auth, ads.getAuthor().getUsername())) { return null; }
         updateAdsDTO(ads, createAds);
         ads = adsRepository.save(ads);
-        if (ads == null) logger.error("Write error into database (function 'updateAds()'");
-        return ads;
+        return createAdsDTO(ads);
     }
 
-    public void removeAds(int id) {
-        // проверка на авторизацию
-        // ...
-
-        adsRepository.deleteById(id);
+    @PreAuthorize("authentication.principal.username != 'user@gmail.com'")
+    @Transactional
+    public void removeAds(int id, Authentication auth) {
+        Ads ads = adsRepository.findById(id).orElse(null);
+        if (ads == null) { return; }
+        if (userService.operationForbidden(auth, ads.getAuthor().getUsername())) { return; }
+        if (!userService.deleteImageFile(ads.getImage())) { return; }
+        commentRepository.deleteAllCommentsByAds(id);
+        adsRepository.deleteAds(id);
     }
 
-    public boolean updateImage(int id, byte[] data) {
-        Image image = imageRepository.findById(id).orElse(null);
-        if (image == null) return false;
+    @PreAuthorize("authentication.principal.username != 'user@gmail.com'")
+    public List<String> updateAdsImage(int adPk, MultipartFile file) {
+        List<String> images = new ArrayList<>();
+        Ads ads = adsRepository.findById(adPk).orElse(null);
+        if (ads == null) { return images; }
 
-        image.setData(new String(data));
-        imageRepository.save(image);
-        return true;
+        String fileName = userService.prepareFileName(file);
+        if (fileName == null) { return images; }
+
+        if (!userService.deleteImageFile(ads.getImage())) {
+            return images;
+        }
+        if (!userService.writeFile(file, fileName)) { return images; }
+        ads.setImage(fileName);
+        adsRepository.save(ads);
+        images.add("/ads/" + ads.getPk() + "/image");
+        return images;
     }
 
     private ResponseWrapperAds getResponseWrapperAdsDTO(List<Ads> adsList) {
-        ResponseWrapperAds responseWrapperAds = new ResponseWrapperAds(adsList);
+        ResponseWrapperAds responseWrapperAds = new ResponseWrapperAds();
+        responseWrapperAds.setCount(adsList.size());
+
+        List<ResponseAds> responseAdsList = new ArrayList<>();
+        for (Ads item : adsList) {
+            responseAdsList.add(createAdsDTO(item));
+        }
+        responseWrapperAds.setResults(responseAdsList);
         return responseWrapperAds;
     }
 
@@ -109,14 +132,19 @@ public class AdsService {
         fullAds.setAuthorLastName(ads.getAuthor().getLastName());
         fullAds.setEmail(ads.getAuthor().getEmail());
         fullAds.setPhone(ads.getAuthor().getPhone());
-        fullAds.setImages((String[])ads.getImages().toArray());
+        fullAds.setImage("/ads/" + ads.getPk() + "/image");
         return fullAds;
     }
 
-    private Ads createAdsDTO(CreateAds createAds) {
-        Ads ads = new Ads(createAds.getTitle(), createAds.getDescription(), createAds.getPrice());
-        ads.setAuthor(userService.getCurrentUser());
-        return ads;
+    private ResponseAds createAdsDTO(Ads ads) {
+        ResponseAds responseAds = new ResponseAds();
+        if (ads == null) { return responseAds; }
+        responseAds.setPk(ads.getPk());
+        responseAds.setTitle(ads.getTitle());
+        responseAds.setAuthor(ads.getAuthor().getId());
+        responseAds.setPrice(ads.getPrice());
+        responseAds.setImage("/ads/" + ads.getPk() + "/image");
+        return responseAds;
     }
 
     private void updateAdsDTO(Ads ads, CreateAds createAds) {
@@ -125,6 +153,13 @@ public class AdsService {
         ads.setPrice(createAds.getPrice());
     }
 
-
+    public byte[] getAdsImage(int adPk) {
+        Ads ads = adsRepository.findById(adPk).orElse(null);
+        if (ads == null) { return new byte[0]; }
+        String fileName = ads.getImage();
+        if (fileName == null || fileName.isEmpty()) { return new byte[0]; }
+        byte[] data = userService.transferFileToByteArray(fileName);
+        return data;
+    }
 
 }

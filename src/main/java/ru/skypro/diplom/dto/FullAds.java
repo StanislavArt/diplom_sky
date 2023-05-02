@@ -9,7 +9,7 @@ public class FullAds {
     private String phone;
     private int pk;
     private int price;
-    private String[] images;
+    private String image;
 
     public FullAds() {}
 
@@ -77,11 +77,11 @@ public class FullAds {
         this.price = price;
     }
 
-    public String[] getImages() {
-        return images;
+    public String getImage() {
+        return image;
     }
 
-    public void setImages(String[] images) {
-        this.images = images;
+    public void setImage(String image) {
+        this.image = image;
     }
 }

@@ -1,27 +1,26 @@
 package ru.skypro.diplom.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
-import org.springframework.web.context.annotation.SessionScope;
-import ru.skypro.diplom.dto.CreateComment;
+import org.springframework.transaction.annotation.Transactional;
+import ru.skypro.diplom.dto.CommentDTO;
 import ru.skypro.diplom.dto.ResponseWrapperComment;
 import ru.skypro.diplom.model.Ads;
 import ru.skypro.diplom.model.Comment;
+import ru.skypro.diplom.model.User;
 import ru.skypro.diplom.repository.AdsRepository;
 import ru.skypro.diplom.repository.CommentRepository;
 
-import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@SessionScope
 public class CommentService {
 
     private final CommentRepository commentRepository;
     private final AdsRepository adsRepository;
     private final UserService userService;
-    private final Logger logger = LoggerFactory.getLogger(CommentService.class);
 
     public CommentService(CommentRepository commentRepository, UserService userService, AdsRepository adsRepository) {
         this.commentRepository = commentRepository;
@@ -29,79 +28,83 @@ public class CommentService {
         this.userService = userService;
     }
 
+    @PreAuthorize("authentication.principal.username != 'user@gmail.com'")
     public ResponseWrapperComment getComments(int adsPk) {
         Ads ads = adsRepository.findById(adsPk).orElse(null);
-        if (ads == null) return null;
-
+        if (ads == null) { return null; }
         List<Comment> comments = commentRepository.findAllByAds(ads);
-        if (comments.isEmpty()) return null;
         return getResponseWrapperCommentDTO(comments);
     }
 
-    public Comment addComment(CreateComment createComment, int adPk) {
-        // проверка авторизации
-        // ...
+    @PreAuthorize("authentication.principal.username != 'user@gmail.com'")
+    public CommentDTO addComment(CommentDTO commentDTO, int adPk, Authentication auth) {
+        User user = userService.getUserFromAuthentication(auth);
+        if (user == null) { return null; }
 
         Ads ads = adsRepository.findById(adPk).orElse(null);
-        if (ads == null) return null;
+        if (ads == null) { return null; }
 
-        Comment comment = createCommentDTO(createComment);
+        Comment comment = new Comment();
         comment.setAds(ads);
-        comment.setAuthor(userService.getCurrentUser());
+        comment.setAuthor(user);
+        comment.setCreatedAt(System.currentTimeMillis());
+        comment.setText(commentDTO.getText());
         comment = commentRepository.save(comment);
-        if (comment == null) logger.error("Write error into database (function 'addComment()'");
-        return comment;
+        return getCommentDTO(comment);
     }
 
-    public Comment getComment(int id, int adPk) {
+    @PreAuthorize("authentication.principal.username != 'user@gmail.com'")
+    @Transactional
+    public boolean deleteComments(int id, int adPk, Authentication auth) {
         Ads ads = adsRepository.findById(adPk).orElse(null);
-        if (ads == null) return null;
+        if (ads == null) { return false; }
+
         Comment comment = commentRepository.findById(id).orElse(null);
-        return comment;
+        if (comment == null) { return false; }
+        if (userService.operationForbidden(auth, comment.getAuthor().getUsername())) { return false; }
+
+        commentRepository.deleteComment(id);
+        return true;
     }
 
-    public void deleteComments(int id, int adPk) {
-        // проверка авторизации
-        // ...
-
+    @PreAuthorize("authentication.principal.username != 'user@gmail.com'")
+    public CommentDTO updateComments(int id, int adPk, CommentDTO commentDTO, Authentication auth) {
         Ads ads = adsRepository.findById(adPk).orElse(null);
-        // NOT_FOUND
-        // if (ads == null) return null;
+        if (ads == null) { return null; }
 
         Comment comment = commentRepository.findById(id).orElse(null);
-        // NOT_FOUND
-        //if (comment == null)
+        if (comment == null) { return null; }
+        if (userService.operationForbidden(auth, comment.getAuthor().getUsername())) {
+            return null;
+        }
 
-        commentRepository.deleteById(id);
-    }
-
-    public Comment updateComments(int id, int adPk, CreateComment createComment) {
-        // проверка авторизации
-        // ...
-
-        Ads ads = adsRepository.findById(adPk).orElse(null);
-        if (ads == null) return null;
-
-        Comment comment = commentRepository.findById(id).orElse(null);
-        if (comment == null) return null;
-
-        comment.setText(createComment.getText());
-        comment.setCreatedAt(LocalDateTime.now().toString());
+        comment.setText(commentDTO.getText());
+        comment.setCreatedAt(System.currentTimeMillis());
         comment = commentRepository.save(comment);
-        return comment;
+        return getCommentDTO(comment);
     }
 
     private ResponseWrapperComment getResponseWrapperCommentDTO(List<Comment> comments) {
         ResponseWrapperComment responseWrapperComment = new ResponseWrapperComment();
         responseWrapperComment.setCount(comments.size());
-        responseWrapperComment.setResults(comments);
+
+        List<CommentDTO> commentDTOList = new ArrayList<>();
+        for (Comment item : comments) {
+            commentDTOList.add(getCommentDTO(item));
+        }
+        responseWrapperComment.setResults(commentDTOList);
         return responseWrapperComment;
     }
 
-    private Comment createCommentDTO(CreateComment createComment) {
-        Comment comment = new Comment();
-        comment.setText(createComment.getText());
-        comment.setCreatedAt(LocalDateTime.now().toString());
-        return comment;
+    private CommentDTO getCommentDTO(Comment comment) {
+        CommentDTO commentDTO = new CommentDTO();
+        if (comment == null) { return commentDTO; }
+        commentDTO.setPk(comment.getPk());
+        commentDTO.setAuthor(comment.getAuthor().getId());
+        commentDTO.setAuthorImage("/users/" + comment.getAuthor().getId() + "/image");
+        commentDTO.setAuthorFirstName(comment.getAuthor().getFirstName());
+        commentDTO.setCreatedAt(comment.getCreatedAt());
+        commentDTO.setText(comment.getText());
+        return commentDTO;
     }
 }

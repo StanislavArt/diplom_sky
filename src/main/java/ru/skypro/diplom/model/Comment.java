@@ -18,7 +18,7 @@ public class Comment {
     @JoinColumn(name = "ads_id")
     private Ads ads;
 
-    private String createdAt;
+    private long createdAt;
     private String text;
 
     public Comment() {}
@@ -47,11 +47,11 @@ public class Comment {
         this.ads = ads;
     }
 
-    public String getCreatedAt() {
+    public long getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(String createdAt) {
+    public void setCreatedAt(long createdAt) {
         this.createdAt = createdAt;
     }
 

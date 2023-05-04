@@ -3,6 +3,9 @@ package ru.skypro.diplom.model;
 import javax.persistence.*;
 import java.util.Objects;
 
+/**
+ * Описывает модель: комментарий к объявлению.
+ */
 @Entity
 @Table(name = "comment")
 public class Comment {

@@ -4,6 +4,9 @@ import javax.persistence.*;
 import java.util.Objects;
 import java.util.Set;
 
+/**
+ * Описывает модель: объявление.
+ */
 @Entity
 @Table(name = "ads")
 public class Ads {

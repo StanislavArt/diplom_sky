@@ -1,5 +1,15 @@
 package ru.skypro.diplom.dto;
 
+/**
+ * Объект DTO для работы с комментариями. Взаимодействует с классом-моделью {@link ru.skypro.diplom.model.Comment}.
+ *
+ * {@code pk}: идентификатор комментария
+ * {@code author}: идентификатор автора
+ * {@code authorImage}: имя файла аватара
+ * {@code authorFirstName}: имя автора
+ * {@code createdAt}: время создания/изменения комментария
+ * {@code text}: текст комментария
+ */
 public class CommentDTO {
     private int pk;
     private int author;

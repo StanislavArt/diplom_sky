@@ -3,6 +3,13 @@ package ru.skypro.diplom.dto;
 import ru.skypro.diplom.model.Ads;
 import java.util.List;
 
+/**
+ * Объект DTO для работы с объявлениями. Взаимодействует с классом-моделью {@link ru.skypro.diplom.model.Ads}
+ *
+ * {@code count}: количество найденных объявлений
+ * {@code results}: список объявлений.
+ * @see ResponseAds
+ */
 public class ResponseWrapperAds {
     private int count;
     private List<ResponseAds> results;

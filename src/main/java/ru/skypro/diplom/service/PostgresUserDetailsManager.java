@@ -14,6 +14,11 @@ import ru.skypro.diplom.repository.UserRepository;
 
 import javax.annotation.PostConstruct;
 
+/**
+ * Реализует интерфейс {@code UserDetailsManager}.
+ * Данный класс используется для создания менеджера по работе с пользователями.
+ * Функциональность класса включает прямое взаимодействие с базой данных.
+ */
 public class PostgresUserDetailsManager implements UserDetailsManager {
     private final Logger logger = LoggerFactory.getLogger(PostgresUserDetailsManager.class);
     private PasswordEncoder encoder;

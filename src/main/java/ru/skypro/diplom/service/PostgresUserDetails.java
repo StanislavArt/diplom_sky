@@ -10,6 +10,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * Расширяет класс {@code User} для работы с дополнительными полями.
+ */
 public class PostgresUserDetails extends User {
     private final String firstName;
     private final String lastName;

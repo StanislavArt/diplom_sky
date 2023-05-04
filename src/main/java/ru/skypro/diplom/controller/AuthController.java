@@ -22,6 +22,13 @@ public class AuthController {
         this.authService = authService;
     }
 
+    /**
+     * Выполняет аутентификацию пользователя
+     *
+     * @param req объект DTO, в который приходит информация с фронт-части для аутентификации пользователя.
+     * @return статус HTTP запроса.
+     * @see LoginReq
+     */
     @PostMapping("/login")
     public ResponseEntity<Void> login(@RequestBody LoginReq req) {
         LoggerFactory.getLogger(this.getClass()).info("login " + req.toString());
@@ -32,6 +39,13 @@ public class AuthController {
         }
     }
 
+    /**
+     * Выполняет регистрацию нового пользователя.
+     *
+     * @param req объект DTO, в который приходит информация с фронт-части для регистрации пользователя.
+     * @return статус HTTP запроса.
+     * @see RegisterReq
+     */
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterReq req) {
         LoggerFactory.getLogger(this.getClass()).info("register " + req.toString());

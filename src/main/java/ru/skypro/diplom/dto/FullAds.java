@@ -1,5 +1,18 @@
 package ru.skypro.diplom.dto;
 
+/**
+ * Объект DTO для работы с объявлениями.
+ *
+ * {@code title}: название объявления
+ * {@code authorFirstName}: имя автора
+ * {@code authorLastName}: фамилия автора
+ * {@code description}: текст объявления
+ * {@code email}: электронная почта автора
+ * {@code phone}: телефон автора
+ * {@code pk}: идентификатор объявления
+ * {@code price}: цена товара
+ * {@code image}: имя файла картинки
+ */
 public class FullAds {
     private String title;
     private String authorFirstName;

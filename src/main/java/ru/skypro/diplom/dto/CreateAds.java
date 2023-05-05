@@ -1,5 +1,12 @@
 package ru.skypro.diplom.dto;
 
+/**
+ * Объект DTO для работы с объявлениями. Взаимодействует с классом-моделью {@link ru.skypro.diplom.model.Ads}
+ *
+ * {@code title}: название объявления
+ * {@code description}: текст объявления
+ * {@code price}: цена товара, представленного в объявлении
+ */
 public class CreateAds {
 
     private String title;

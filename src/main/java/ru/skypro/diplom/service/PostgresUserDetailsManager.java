@@ -2,23 +2,43 @@ package ru.skypro.diplom.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.UserDetailsManager;
 import ru.skypro.diplom.model.User;
 import ru.skypro.diplom.repository.UserRepository;
 
+import javax.annotation.PostConstruct;
+
+/**
+ * Реализует интерфейс {@code UserDetailsManager}.
+ * Данный класс используется для создания менеджера по работе с пользователями.
+ * Функциональность класса включает прямое взаимодействие с базой данных.
+ */
 public class PostgresUserDetailsManager implements UserDetailsManager {
     private final Logger logger = LoggerFactory.getLogger(PostgresUserDetailsManager.class);
-    private final PasswordEncoder encoder = new BCryptPasswordEncoder();
-    private final UserRepository userRepository;
+    private PasswordEncoder encoder;
 
-    public PostgresUserDetailsManager(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    @Autowired
+    private UserRepository userRepository;
+
+    private PostgresUserDetailsManager() {}
+
+    @PostConstruct
+    void init() {
+        if (PostgresUserDetails.getEncoder() == null) {
+            PostgresUserDetails.setEncoder(encoder);
+        }
+    }
+
+    public static PostgresUserDetailsManager build(PasswordEncoder encoder) {
+        PostgresUserDetailsManager manager = new PostgresUserDetailsManager();
+        manager.encoder = encoder;
+        return manager;
     }
 
     @Override
@@ -83,5 +103,9 @@ public class PostgresUserDetailsManager implements UserDetailsManager {
             return;
         }
         userRepository.save(userBD);
+    }
+
+    public PasswordEncoder getEncoder() {
+        return encoder;
     }
 }

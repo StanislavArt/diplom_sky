@@ -3,7 +3,6 @@ package ru.skypro.diplom.service;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import ru.skypro.diplom.enums.Role;
 
@@ -11,6 +10,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * Расширяет класс {@code User} для работы с дополнительными полями.
+ */
 public class PostgresUserDetails extends User {
     private final String firstName;
     private final String lastName;
@@ -18,6 +20,8 @@ public class PostgresUserDetails extends User {
     private final String phone;
     private final String image;
     private final int id;
+
+    private static PasswordEncoder encoder;
 
     public PostgresUserDetails(ru.skypro.diplom.model.User user) {
         super(user.getUsername(), user.getPassword(), List.of(user.getRole()));
@@ -51,7 +55,6 @@ public class PostgresUserDetails extends User {
         private String username;
         private String password;
         private List<GrantedAuthority> authorities;
-        private final PasswordEncoder encoder = new BCryptPasswordEncoder();
 
         private PostgresUserDetailsBuilder() {}
 
@@ -140,5 +143,13 @@ public class PostgresUserDetails extends User {
 
     public int getId() {
         return id;
+    }
+
+    public static PasswordEncoder getEncoder() {
+        return encoder;
+    }
+
+    public static void setEncoder(PasswordEncoder encoder) {
+        PostgresUserDetails.encoder = encoder;
     }
 }

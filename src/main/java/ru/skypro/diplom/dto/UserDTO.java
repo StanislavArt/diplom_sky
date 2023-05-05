@@ -1,5 +1,15 @@
 package ru.skypro.diplom.dto;
 
+/**
+ * Объект DTO для работы с пользователями. Взаимодействует с классом-моделью {@link ru.skypro.diplom.model.User}.
+ *
+ * {@code id}: идентификатор пользователя
+ * {@code firstName}: имя пользователя
+ * {@code lastName}: фамилия пользователя
+ * {@code email}: электронная почта пользователя
+ * {@code phone}: телефон пользователя
+ * {@code image}: имя файла аватара пользователя
+ */
 public class UserDTO {
     private int id;
     private String firstName;

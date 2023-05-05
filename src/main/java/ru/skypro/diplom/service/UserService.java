@@ -18,6 +18,7 @@ import ru.skypro.diplom.repository.UserRepository;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Objects;
@@ -61,6 +62,9 @@ public class UserService {
         String fileName = prepareFileName(file);
         if (fileName == null) { return false; }
 
+        if (!deleteImageFile(user.getImage())) {
+            return false;
+        }
         if (!writeFile(file, fileName)) { return false; }
         user.setImage(fileName);
         user = userRepository.save(user);
@@ -146,8 +150,23 @@ public class UserService {
 
     public boolean operationForbidden(Authentication auth, String usernameOwner) {
         if (auth.getAuthorities().contains(Role.ADMIN)) { return false; }
-        if (auth.getName() == usernameOwner) { return false; }
+        if (auth.getName().equals(usernameOwner)) { return false; }
         return true;
+    }
+
+    public boolean deleteImageFile(String fileName) {
+        try {
+            if (fileName == null || fileName.isEmpty()) { return true; }
+            Path filePath = Paths.get(storagePath + fileName);
+            if (!Files.exists(filePath)) { return true; }
+            Files.delete(filePath);
+            logger.info("Удален файл с изображением из хранилища ({})", fileName);
+            return true;
+        } catch (IOException e) {
+            logger.error("Error deleting file in function 'deleteImageFile()'");
+            logger.error(Arrays.toString(e.getStackTrace()));
+            return false;
+        }
     }
 
 }

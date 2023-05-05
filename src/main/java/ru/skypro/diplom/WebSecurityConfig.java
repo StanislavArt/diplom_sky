@@ -2,18 +2,14 @@ package ru.skypro.diplom;
 
 import org.springframework.context.annotation.*;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.userdetails.*;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import ru.skypro.diplom.repository.UserRepository;
-import ru.skypro.diplom.service.PostgresUserDetails;
 import ru.skypro.diplom.service.PostgresUserDetailsManager;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 public class WebSecurityConfig {
-
-    private final UserRepository userRepository;
 
     private static final String[] AUTH_WHITELIST = {
             "/swagger-resources/**",
@@ -23,27 +19,9 @@ public class WebSecurityConfig {
             "/login", "/register"
     };
 
-    public WebSecurityConfig(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
     @Bean
     public PostgresUserDetailsManager userDetailsService() {
-        PostgresUserDetailsManager manager = new PostgresUserDetailsManager(userRepository);
-
-        manager.createUser(PostgresUserDetails.builderPostgres()
-                .username("user@gmail.com")
-                .password("password")
-                .role("USER")
-                .build());
-
-        manager.createUser(PostgresUserDetails.builderPostgres()
-                .username("admin@gmail.com")
-                .password("admin")
-                .role("ADMIN")
-                .firstName("Николя")
-                .build());
-        return manager;
+        return PostgresUserDetailsManager.build(new BCryptPasswordEncoder());
     }
 
     @Bean
@@ -60,7 +38,5 @@ public class WebSecurityConfig {
                 .httpBasic(withDefaults());
         return http.build();
     }
-
-
 }
 

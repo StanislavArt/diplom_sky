@@ -2,9 +2,9 @@ package ru.skypro.diplom;
 
 import org.springframework.context.annotation.*;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.userdetails.*;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import ru.skypro.diplom.service.PostgresUserDetailsManager;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -20,13 +20,8 @@ public class WebSecurityConfig {
     };
 
     @Bean
-    public InMemoryUserDetailsManager userDetailsService() {
-        UserDetails user = User.withDefaultPasswordEncoder()
-                .username("user@gmail.com")
-                .password("password")
-                .roles("USER")
-                .build();
-        return new InMemoryUserDetailsManager(user);
+    public PostgresUserDetailsManager userDetailsService() {
+        return PostgresUserDetailsManager.build(new BCryptPasswordEncoder());
     }
 
     @Bean
@@ -36,14 +31,12 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests((authz) ->
                         authz
                                 .mvcMatchers(AUTH_WHITELIST).permitAll()
-//                                .mvcMatchers("/ads/**", "/users/**").authenticated()
+                                .mvcMatchers("/ads/**", "/users/**").authenticated()
 
                 )
-                .cors().disable()
+                .cors().and()
                 .httpBasic(withDefaults());
         return http.build();
     }
-
-
 }
 

@@ -3,6 +3,12 @@ package ru.skypro.diplom.dto;
 
 import java.util.Objects;
 
+/**
+ * Объект DTO для работы с пользователями. Взаимодействует с классом-моделью {@link ru.skypro.diplom.model.User}.
+ *
+ * {@code password}: пароль пользователя
+ * {@code username}: учетное имя пользователя
+ */
 public class LoginReq {
     private String password;
     private String username;

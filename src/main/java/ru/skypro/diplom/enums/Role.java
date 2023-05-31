@@ -1,8 +1,10 @@
 package ru.skypro.diplom.enums;
 
-public enum Role {
-    USER("user"),
-    ADMIN("admin");
+import org.springframework.security.core.GrantedAuthority;
+
+public enum Role implements GrantedAuthority {
+    USER("ROLE_USER"),
+    ADMIN("ROLE_ADMIN");
 
     private String name;
 
@@ -10,8 +12,8 @@ public enum Role {
         this.name = name;
     }
 
-    public String getName() {
+    @Override
+    public String getAuthority() {
         return name;
     }
-
 }

@@ -1,5 +1,14 @@
 package ru.skypro.diplom.dto;
 
+/**
+ * Объект DTO для работы с объявлениями. Взаимодействует с классом-моделью {@link ru.skypro.diplom.model.Ads}
+ *
+ * {@code pk}: идентификатор объявления
+ * {@code author}: идентификатор автора объявления
+ * {@code image}: имя файла картинки объявления
+ * {@code price}: цена товара
+ * {@code title}: название объявления
+ */
 public class ResponseAds {
     private int pk;
     private int author;

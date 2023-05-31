@@ -5,6 +5,17 @@ import ru.skypro.diplom.enums.Role;
 
 import java.util.Objects;
 
+/**
+ * Объект DTO для работы с пользователями. Взаимодействует с классом-моделью {@link ru.skypro.diplom.model.User}.
+ * Используется при регистрации нового пользователя.
+ *
+ * {@code password}: пароль пользователя
+ * {@code username}: учетное имя пользователя
+ * {@code firstName}: имя пользователя
+ * {@code lastName}: фамилия пользователя
+ * {@code phone}: телефон пользователя
+ * {@code role}: роль пользователя. См. {@link Role}
+ */
 public class RegisterReq {
     private String username;
     private String password;

@@ -6,6 +6,9 @@ import javax.persistence.*;
 import java.util.Objects;
 import java.util.Set;
 
+/**
+ * Описывает модель: пользователь.
+ */
 @Entity
 @Table(name = "client")
 public class User {
